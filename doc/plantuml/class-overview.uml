@@ -1,0 +1,73 @@
+@startuml
+
+enum player {
+  PLAYER_NONE
+  PLAYER_BLACk
+  PLAYER_WHITE
+} 
+
+class goBoard {
+  +int size
+  +player points[size][size]
+  +void init(int size)
+  +goBoard copy()
+  +void print()
+  +int validMove(int i, int j)
+  +void move(int i, int j)
+  +int numOfPossibleMoves()
+  +player winner()
+}
+
+class goGame {
+  +player actPlayer
+  +init()
+  +nextPlayer()
+}
+goGame *-- goBoard
+
+abstract class abstractPlayer {
+  +{abstract} void getMove(int *i, int *j)
+}
+abstractPlayer o-- goGame
+
+abstractPlayer <|-- minimaxAIPlayer
+class minimaxAIPlayer {
+  -minimax(int *i, int *j, goGame *newState)
+  +void getMove(int *i, int *j)
+}
+minimaxAIPlayer o-- goBoardIterator
+minimaxAIPlayer *-- goBoardScoreEstimator
+
+abstractPlayer <|-- CliUIPlayer
+class CliUIPlayer {
+  +void getMove(int *i, int *j)
+}
+
+abstractPlayer <|-- SGFPlayer
+class SGFPlayer {
+  +void getMove(int *i, int *j)
+}
+
+abstractPlayer <|-- KGSPlayer
+class KGSPlayer {
+  +void getMove(int *i, int *j)
+}
+
+class goBoardScoreEstimator {
+  +void init(goBoard board)
+  +int  estimateScore()
+}
+goBoardScoreEstimator o-- goBoard
+
+class goBoardIterator {
+  -int i
+  -int j
+  +void init()
+  +int finished()
+  +void next()
+  +void get(int *i, int *j)
+}
+goBoardIterator o-- goBoard
+
+
+@enduml
