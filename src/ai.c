@@ -30,14 +30,13 @@ static int miniMax_search(MiniMax *self,
     BoardIterator iter = boardIterator_create(&game->board);
     for(;boardIterator_next(&iter);)
     {
-      BoardCoord nextCoord = iter.coord;
-      if (game->validMove(game, nextCoord)
+      if (game->validMove(game, iter.coord)
           && (self->monteCarloThreshold < ((double)rand()/RAND_MAX))
          ) {
         BoardCoord tmpCoord;
         Game nextGame = game_copy(game);
         game_switchPlayer(&nextGame);
-        board_setCell(&nextGame.board, nextCoord, game_actPlayerCell(game));
+        board_setCell(&nextGame.board, iter.coord, game_actPlayerCell(game));
         score = miniMax_search(self, &tmpCoord, &nextGame);
         board_destruct(&nextGame.board);
         if ( game->actPlayer == self->game->actPlayer
@@ -45,7 +44,7 @@ static int miniMax_search(MiniMax *self,
             : (score < extrScore) ) 
         { 
           extrScore = score;
-          extrCoord = nextCoord;
+          extrCoord = iter.coord;
         }
       }
     }  
