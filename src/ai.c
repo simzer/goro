@@ -6,8 +6,7 @@
 
 static int miniMax_search(MiniMax *self,
                           BoardCoord *coord,
-                          Game *game,
-                          Player origPlayer);
+                          Game *game);
 
 MiniMax miniMax_create(Game *game) {
   MiniMax self;
@@ -18,8 +17,7 @@ MiniMax miniMax_create(Game *game) {
 
 static int miniMax_search(MiniMax *self,
                           BoardCoord *coord,
-                          Game *game,
-                          Player origPlayer)
+                          Game *game)
 {
   int result;
   Player winner = game->winner(game);
@@ -27,7 +25,7 @@ static int miniMax_search(MiniMax *self,
       && (winner == player_none) )
   {
     int score;
-    int extrScore = game->actPlayer == origPlayer ? -0x8000 : 0x7FFF;
+    int extrScore = game->actPlayer == self->game->actPlayer ? -0x8000 : 0x7FFF;
     BoardCoord extrCoord;
     BoardIterator iter = boardIterator_create(&game->board);
     for(;boardIterator_next(&iter);)
@@ -40,9 +38,9 @@ static int miniMax_search(MiniMax *self,
         Game nextGame = game_copy(game);
         game_switchPlayer(&nextGame);
         board_setCell(&nextGame.board, nextCoord, game_actPlayerCell(game));
-        score = miniMax_search(self, &tmpCoord, &nextGame, origPlayer);
+        score = miniMax_search(self, &tmpCoord, &nextGame);
         board_destruct(&nextGame.board);
-        if ( game->actPlayer == origPlayer
+        if ( game->actPlayer == self->game->actPlayer
             ? (score > extrScore) 
             : (score < extrScore) ) 
         { 
@@ -54,9 +52,9 @@ static int miniMax_search(MiniMax *self,
     *coord = extrCoord;
     result = extrScore;
   } else {
-    result = (winner == origPlayer   ? +1 :
-              winner == player_none  ?  0 :
-                                       -1 );
+    result = (winner == self->game->actPlayer ? +1 :
+              winner == player_none           ?  0 :
+                                                -1 );
   }
   return result;
 }
@@ -64,6 +62,6 @@ static int miniMax_search(MiniMax *self,
 BoardCoord miniMax_move(MiniMax *self)
 {
   BoardCoord coord;
-  miniMax_search(self, &coord, self->game, self->game->actPlayer);
+  miniMax_search(self, &coord, self->game);
   return(coord);
 }

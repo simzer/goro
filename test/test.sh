@@ -9,6 +9,6 @@ function test {
   fi
 }
 
-make all
-test "--tictactoe" "a1\na2\nc1\nb3\nc3\n" "Nobody"
-test "--tictactoe" "a1\na2\nb3\n" "\"Player 1\""
+make all \
+&& test "--tictactoe" "a1\na2\nc1\nb3\nc3\n" "Nobody" \
+&& test "--tictactoe" "a1\na2\nb3\n" "\"Player 1\""
