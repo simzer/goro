@@ -18,6 +18,13 @@ BoardCoord boardCoord_create(BoardSize row, BoardSize col) {
   return self;
 }
 
+BoardCoord boardCoord_add(BoardCoord *self, BoardCoord *add) {
+  BoardCoord res = *self;
+  res.row += add->row;
+  res.col += add->col;
+  return res;
+}
+
 Board board_create(BoardSize width,
                    BoardSize height)
 {
@@ -71,11 +78,28 @@ void board_setCell(Board *self, BoardCoord coord, BoardCell cell)
 void board_print(Board *self)
 {
   BoardIterator iter = boardIterator_create(self);
+  int i;
+  printf("   ");
+  for(i = 0; i < self->width; i++) printf("%c ", 'A'+i);
+  printf("\n");
   for(;boardIterator_next(&iter);)
   {
+    if (iter.coord.col == 0) printf("%2d ", iter.coord.row+1);
     printf("%c ", board_signs[board_getCell(self, iter.coord)]);
     if (iter.coord.col == self->width-1) printf("\n");
   }
+}
+
+int board_isThereEmptyCell(Board *self)
+{
+  int emptyCellCount = 0;
+  BoardIterator iter = boardIterator_create(self);
+  for(;boardIterator_next(&iter);) {
+    if (board_getCell(self, iter.coord) == boardCell_empty) {
+      emptyCellCount++;
+    }
+  }
+  return(emptyCellCount > 0);
 }
 
 void board_save(Board *self, FILE *file)

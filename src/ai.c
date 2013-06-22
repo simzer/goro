@@ -4,7 +4,7 @@
 #include "boarditerator.h"
 #include "ai.h"
 
-double ai_mcThreshold = 0.0;
+double ai_mcThreshold = 0.9;
 
 static int ai_minimax(BoardCoord *coord,
                       Game *game,
