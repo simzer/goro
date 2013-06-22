@@ -19,6 +19,7 @@ typedef struct {
   BoardSize row;
   BoardSize col;
 } BoardCoord;
+extern const BoardCoord boardCoord_null;
 
 typedef struct {
   BoardSize width;
@@ -27,15 +28,16 @@ typedef struct {
 } Board;
 
 extern Board board_create(BoardSize width, BoardSize height);
+extern Board board_load(FILE *file);
+extern Board board_copy(Board *self);
 extern void board_clear(Board *self);
 extern void board_destruct(Board *self);
-extern BoardCell board_getCell(Board *self, BoardSize row, BoardSize col);
-extern int board_setCell(Board *self, BoardSize row, BoardSize col, BoardCell cell);
-extern Board board_copy(Board *self);
+extern BoardCell board_getCell(Board *self, BoardCoord coord);
+extern void board_setCell(Board *self, BoardCoord coord, BoardCell cell);
+extern int board_coordOutOfBoard(Board *self, BoardCoord coord);
 extern void board_print(Board *self);
-extern void board_save(FILE *file, Board *self);
-extern Board board_load(FILE *file);
-extern int board_validMove(BoardSize row, BoardSize col, Board *self);
+extern void board_save(Board *self, FILE *file);
+extern int board_validMove(Board *self, BoardCoord coord);
 extern int board_movesPossible(Board *self);
 extern BoardCell board_winner(Board *self);
 

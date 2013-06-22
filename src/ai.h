@@ -7,6 +7,6 @@
 
 extern double ai_mcThreshold;
 
-extern void ai_move(BoardSize *i, BoardSize *j, Game *game, Board *board);
+extern void ai_move(BoardCoord *coord, Game *game, Board *board);
 
 #endif

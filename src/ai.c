@@ -6,7 +6,7 @@
 
 double ai_mcThreshold = 0.0;
 
-static int ai_minimax(int *row, int *col, 
+static int ai_minimax(BoardCoord *coord,
                       Game *game,
                       Game *origGame,
                       Board *board)
@@ -18,36 +18,32 @@ static int ai_minimax(int *row, int *col,
   {
     int score;
     int extrScore = game->actPlayer == origGame->actPlayer ? -0x8000 : 0x7FFF;
-    int extrRow, extrCol;
+    BoardCoord extrCoord;
     BoardIterator iter = boardIterator_create(board);
     for(;boardIterator_next(&iter);)
     {
-      int nextRow, nextCol;
-      nextRow = iter.col;
-      nextCol = iter.row;
-      if (board_validMove(nextRow, nextCol, board)
+      BoardCoord nextCoord = iter.coord;
+      if (board_validMove(board, nextCoord)
           && (ai_mcThreshold < ((double)rand()/RAND_MAX))
          ) {
-        BoardSize tmpI, tmpJ;
+        BoardCoord tmpCoord;
         Board nextBoard;
         Game nextGame = *game;
         nextBoard = board_copy(board);
         game_switchPlayer(&nextGame);
-        board_setCell(&nextBoard, nextRow, nextCol, game->actPlayer);
-        score = ai_minimax(&tmpI, &tmpJ, &nextGame, origGame, &nextBoard);
+        board_setCell(&nextBoard, nextCoord, game->actPlayer);
+        score = ai_minimax(&tmpCoord, &nextGame, origGame, &nextBoard);
         board_destruct(&nextBoard);
         if ( game->actPlayer == origGame->actPlayer
             ? (score > extrScore) 
             : (score < extrScore) ) 
         { 
           extrScore = score;
-          extrRow = nextRow;
-          extrCol = nextCol;
+          extrCoord = nextCoord;
         }
       }
     }  
-    *row = extrRow;
-    *col = extrCol; 
+    *coord = extrCoord;
     result = extrScore;
   } else {
     result = (winner == origGame->actPlayer   ? +1 :
@@ -57,8 +53,9 @@ static int ai_minimax(int *row, int *col,
   return result;
 }
 
-void ai_move(BoardSize *i, BoardSize *j, Game *game, Board *board)
+void ai_move(BoardCoord *coord, Game *game, Board *board)
 {
-  ai_minimax(i, j, game, game, board);
-  printf("Player %d step: %c%d\n", game->actPlayer, 'a'+*i, 1+*j);
+  ai_minimax(coord, game, game, board);
+  printf("Player %d step: %c%d\n",
+         game->actPlayer, 'a'+coord->col, 1+coord->row);
 }

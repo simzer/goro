@@ -7,8 +7,7 @@
 typedef struct
 {
   int run;
-  BoardSize row;
-  BoardSize col;
+  BoardCoord coord;
   Board *board;
 } BoardIterator;
 

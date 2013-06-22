@@ -11,7 +11,7 @@ int main(void)
 {
   Board board = board_create(19,19);
   Game game = game_create();
-  BoardSize i, j;
+  BoardCoord coord;
   Player winner;
   while(winner = board_winner(&board),
         (   winner == player_none
@@ -20,11 +20,11 @@ int main(void)
     game_switchPlayer(&game);
     board_print(&board);
     if (game.actPlayer == player_1) {
-      ui_move(&i, &j, &game, &board);
+      ui_move(&coord, &game, &board);
     } else {
-      ai_move(&i, &j, &game, &board);
+      ai_move(&coord, &game, &board);
     }
-    board_setCell(&board, i, j, game.actPlayer);
+    board_setCell(&board, coord, game.actPlayer);
   }
   board_print(&board);
   printf(winner == 0 ? "Nobody won!\n" : "Player %d won!\n", winner);

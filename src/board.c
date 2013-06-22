@@ -5,6 +5,9 @@
 #include <assert.h>
 
 #include "board.h"
+#include "boarditerator.h"
+
+const BoardCoord boardCoord_null = { 0, 0 };
 
 const char board_signs[] = { ' ', '0', 'O'};
 
@@ -39,40 +42,35 @@ void board_destruct(Board *self)
   free(self->board);
 }
 
-BoardCell board_getCell(Board *self, BoardSize row, BoardSize col)
+int board_coordOutOfBoard(Board *self, BoardCoord coord)
 {
-  if (   row < 0 || row >= self->height
-      || col < 0 || col >= self->width) {
-    return(boardCell_invalid);
-  } else {
-    return(self->board[row*self->width + col]);
-  }
+  return (   coord.row < 0 || coord.row >= self->height
+          || coord.col < 0 || coord.col >= self->width);
 }
 
-int board_setCell(Board *self, BoardSize row, BoardSize col, BoardCell cell)
+BoardCell board_getCell(Board *self, BoardCoord coord)
 {
-  if (   row < 0 || row >= self->height
-      || col < 0 || col >= self->width)
-    return(1);
+  assert(board_coordOutOfBoard(self, coord));
+  return(self->board[coord.row*self->width + coord.col]);
+}
 
-  self->board[row*self->width + col] = cell;
-  return(0);
+void board_setCell(Board *self, BoardCoord coord, BoardCell cell)
+{
+  assert(board_coordOutOfBoard(self, coord));
+  self->board[coord.row * self->width + coord.col] = cell;
 }
 
 void board_print(Board *self)
 {
-  BoardSize row, col;
-  for(row = 0; row < self->height; row++)
+  BoardIterator iter = boardIterator_create(self);
+  for(;boardIterator_next(&iter);)
   {
-    for(col = 0; col < self->width; col++)
-    {
-      printf("%c ", board_signs[board_getCell(self, row, col)]);
-    }
-    printf("\n");
+    printf("%c ", board_signs[board_getCell(self, iter.coord)]);
+    if (iter.coord.col == self->width-1) printf("\n");
   }
 }
 
-void board_save(FILE *file, Board *self)
+void board_save(Board *self, FILE *file)
 {
   BoardSize width  = self->width;
   BoardSize height = self->height;
@@ -111,7 +109,7 @@ Board board_load(FILE *file)
 }
 
 
-int board_validMove(BoardSize row, BoardSize col, Board *self)
+int board_validMove(Board *self, BoardCoord coord)
 { 
 /// to be implemented
 }
