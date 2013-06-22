@@ -5,8 +5,12 @@
 #include "game.h"
 #include "board.h"
 
-extern double ai_mcThreshold;
+typedef struct MiniMax {
+  Game *game;
+  double monteCarloThreshold;
+} MiniMax;
 
-extern BoardCoord ai_move(Game *game);
+extern MiniMax miniMax_create(Game *game);
+extern BoardCoord miniMax_move(MiniMax *self);
 
 #endif

@@ -4,11 +4,22 @@
 #include "boarditerator.h"
 #include "ai.h"
 
-double ai_mcThreshold = 0.9;
+static int miniMax_search(MiniMax *self,
+                          BoardCoord *coord,
+                          Game *game,
+                          Player origPlayer);
 
-static int ai_minimax(BoardCoord *coord,
-                      Game *game,
-                      Game *origGame)
+MiniMax miniMax_create(Game *game) {
+  MiniMax self;
+  self.monteCarloThreshold = 0.0;
+  self.game = game;
+  return self;
+}
+
+static int miniMax_search(MiniMax *self,
+                          BoardCoord *coord,
+                          Game *game,
+                          Player origPlayer)
 {
   int result;
   Player winner = game->winner(game);
@@ -16,22 +27,22 @@ static int ai_minimax(BoardCoord *coord,
       && (winner == player_none) )
   {
     int score;
-    int extrScore = game->actPlayer == origGame->actPlayer ? -0x8000 : 0x7FFF;
+    int extrScore = game->actPlayer == origPlayer ? -0x8000 : 0x7FFF;
     BoardCoord extrCoord;
     BoardIterator iter = boardIterator_create(&game->board);
     for(;boardIterator_next(&iter);)
     {
       BoardCoord nextCoord = iter.coord;
       if (game->validMove(game, nextCoord)
-          && (ai_mcThreshold < ((double)rand()/RAND_MAX))
+          && (self->monteCarloThreshold < ((double)rand()/RAND_MAX))
          ) {
         BoardCoord tmpCoord;
         Game nextGame = game_copy(game);
         game_switchPlayer(&nextGame);
         board_setCell(&nextGame.board, nextCoord, game_actPlayerCell(game));
-        score = ai_minimax(&tmpCoord, &nextGame, origGame);
+        score = miniMax_search(self, &tmpCoord, &nextGame, origPlayer);
         board_destruct(&nextGame.board);
-        if ( game->actPlayer == origGame->actPlayer
+        if ( game->actPlayer == origPlayer
             ? (score > extrScore) 
             : (score < extrScore) ) 
         { 
@@ -43,18 +54,16 @@ static int ai_minimax(BoardCoord *coord,
     *coord = extrCoord;
     result = extrScore;
   } else {
-    result = (winner == origGame->actPlayer   ? +1 :
-              winner == player_none           ?  0 :
-                                                -1 );
+    result = (winner == origPlayer   ? +1 :
+              winner == player_none  ?  0 :
+                                       -1 );
   }
   return result;
 }
 
-BoardCoord ai_move(Game *game)
+BoardCoord miniMax_move(MiniMax *self)
 {
   BoardCoord coord;
-  ai_minimax(&coord, game, game);
-  printf("Player %d step: %c%d\n",
-         game->actPlayer, 'a'+coord.col, 1+coord.row);
+  miniMax_search(self, &coord, self->game, self->game->actPlayer);
   return(coord);
 }
