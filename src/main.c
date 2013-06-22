@@ -24,7 +24,7 @@ int main(void)
     } else {
       ai_move(&coord, &game, &board);
     }
-    board_setCell(&board, coord, game.actPlayer);
+    board_setCell(&board, coord, game_actPlayerCell(&game));
   }
   board_print(&board);
   printf(winner == 0 ? "Nobody won!\n" : "Player %d won!\n", winner);

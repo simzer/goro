@@ -31,7 +31,7 @@ static int ai_minimax(BoardCoord *coord,
         Game nextGame = *game;
         nextBoard = board_copy(board);
         game_switchPlayer(&nextGame);
-        board_setCell(&nextBoard, nextCoord, game->actPlayer);
+        board_setCell(&nextBoard, nextCoord, game_actPlayerCell(game));
         score = ai_minimax(&tmpCoord, &nextGame, origGame, &nextBoard);
         board_destruct(&nextBoard);
         if ( game->actPlayer == origGame->actPlayer
