@@ -9,7 +9,7 @@
 
 const BoardCoord boardCoord_null = { 0, 0 };
 
-const char board_signs[] = { '.', '0', 'O'};
+const char board_signs[] = { '.', '@', 'O'};
 
 BoardCoord boardCoord_create(BoardSize row, BoardSize col) {
   BoardCoord self;
@@ -57,8 +57,9 @@ int board_coordInBoard(Board *self, BoardCoord coord)
 
 BoardCell board_getCell(Board *self, BoardCoord coord)
 {
-  assert(board_coordInBoard(self, coord));
-  return(self->board[coord.row*self->width + coord.col]);
+  if(board_coordInBoard(self, coord))
+    return self->board[coord.row*self->width + coord.col];
+  return boardCell_invalid;
 }
 
 void board_setCell(Board *self, BoardCoord coord, BoardCell cell)
