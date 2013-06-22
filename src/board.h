@@ -11,8 +11,6 @@ typedef enum BoardCell {
   boardCell_invalid = 3
 } BoardCell;
 
-typedef char BoarCellContainer;
-
 typedef int BoardSize;
 
 typedef struct {
@@ -24,7 +22,7 @@ extern const BoardCoord boardCoord_null;
 typedef struct {
   BoardSize width;
   BoardSize height;
-  BoarCellContainer *board;
+  char *board;
 } Board;
 
 extern Board board_create(BoardSize width, BoardSize height);
@@ -34,11 +32,8 @@ extern void board_clear(Board *self);
 extern void board_destruct(Board *self);
 extern BoardCell board_getCell(Board *self, BoardCoord coord);
 extern void board_setCell(Board *self, BoardCoord coord, BoardCell cell);
-extern int board_coordOutOfBoard(Board *self, BoardCoord coord);
+extern int board_coordInBoard(Board *self, BoardCoord coord);
 extern void board_print(Board *self);
 extern void board_save(Board *self, FILE *file);
-extern int board_validMove(Board *self, BoardCoord coord);
-extern int board_movesPossible(Board *self);
-extern BoardCell board_winner(Board *self);
 
 #endif

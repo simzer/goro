@@ -8,32 +8,29 @@ double ai_mcThreshold = 0.0;
 
 static int ai_minimax(BoardCoord *coord,
                       Game *game,
-                      Game *origGame,
-                      Board *board)
+                      Game *origGame)
 {
   int result;
-  Player winner = board_winner(board);
-  if (   board_movesPossible(board)
+  Player winner = game->winner(game);
+  if (   game->movesPossible(game)
       && (winner == player_none) )
   {
     int score;
     int extrScore = game->actPlayer == origGame->actPlayer ? -0x8000 : 0x7FFF;
     BoardCoord extrCoord;
-    BoardIterator iter = boardIterator_create(board);
+    BoardIterator iter = boardIterator_create(&game->board);
     for(;boardIterator_next(&iter);)
     {
       BoardCoord nextCoord = iter.coord;
-      if (board_validMove(board, nextCoord)
+      if (game->validMove(game, nextCoord)
           && (ai_mcThreshold < ((double)rand()/RAND_MAX))
          ) {
         BoardCoord tmpCoord;
-        Board nextBoard;
-        Game nextGame = *game;
-        nextBoard = board_copy(board);
+        Game nextGame = game_copy(game);
         game_switchPlayer(&nextGame);
-        board_setCell(&nextBoard, nextCoord, game_actPlayerCell(game));
-        score = ai_minimax(&tmpCoord, &nextGame, origGame, &nextBoard);
-        board_destruct(&nextBoard);
+        board_setCell(&nextGame.board, nextCoord, game_actPlayerCell(game));
+        score = ai_minimax(&tmpCoord, &nextGame, origGame);
+        board_destruct(&nextGame.board);
         if ( game->actPlayer == origGame->actPlayer
             ? (score > extrScore) 
             : (score < extrScore) ) 
@@ -53,9 +50,9 @@ static int ai_minimax(BoardCoord *coord,
   return result;
 }
 
-void ai_move(BoardCoord *coord, Game *game, Board *board)
+void ai_move(BoardCoord *coord, Game *game)
 {
-  ai_minimax(coord, game, game, board);
+  ai_minimax(coord, game, game);
   printf("Player %d step: %c%d\n",
          game->actPlayer, 'a'+coord->col, 1+coord->row);
 }

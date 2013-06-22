@@ -9,7 +9,7 @@
 
 const BoardCoord boardCoord_null = { 0, 0 };
 
-const char board_signs[] = { ' ', '0', 'O'};
+const char board_signs[] = { '.', '0', 'O'};
 
 Board board_create(BoardSize width,
                    BoardSize height)
@@ -17,7 +17,7 @@ Board board_create(BoardSize width,
   Board self;
   self.width  = width;
   self.height = height;
-  self.board  = malloc(width * height * sizeof(BoarCellContainer));
+  self.board  = malloc(width * height * sizeof(self.board[0]));
   assert(self.board != 0);
   board_clear(&self);
   return self;
@@ -26,14 +26,14 @@ Board board_create(BoardSize width,
 void board_clear(Board *self)
 {
   memset(self->board, 0,
-         self->width * self->height * sizeof(BoarCellContainer));
+         self->width * self->height * sizeof(self->board[0]));
 }
 
 Board board_copy(Board *self)
 {
   Board res = board_create(self->width, self->height);
   memcpy(res.board, self->board,
-         self->width * self->height * sizeof(BoarCellContainer));
+         self->width * self->height * sizeof(self->board[0]));
   return(res);
 }
 
@@ -42,21 +42,21 @@ void board_destruct(Board *self)
   free(self->board);
 }
 
-int board_coordOutOfBoard(Board *self, BoardCoord coord)
+int board_coordInBoard(Board *self, BoardCoord coord)
 {
-  return (   coord.row < 0 || coord.row >= self->height
-          || coord.col < 0 || coord.col >= self->width);
+  return (   coord.row >= 0 && coord.row < self->height
+          && coord.col >= 0 && coord.col < self->width);
 }
 
 BoardCell board_getCell(Board *self, BoardCoord coord)
 {
-  assert(board_coordOutOfBoard(self, coord));
+  assert(board_coordInBoard(self, coord));
   return(self->board[coord.row*self->width + coord.col]);
 }
 
 void board_setCell(Board *self, BoardCoord coord, BoardCell cell)
 {
-  assert(board_coordOutOfBoard(self, coord));
+  assert(board_coordInBoard(self, coord));
   self->board[coord.row * self->width + coord.col] = cell;
 }
 
@@ -76,7 +76,7 @@ void board_save(Board *self, FILE *file)
   BoardSize height = self->height;
   if(    ( fwrite(&width,       sizeof(int), 1, file) == 1 )
       && ( fwrite(&height,      sizeof(int), 1, file) == 1 )
-      && ( fwrite(self->board, sizeof(BoarCellContainer),
+      && ( fwrite(self->board, sizeof(self->board[0]),
                   width*height, file) == width*height) )
   {
     return;
@@ -96,7 +96,7 @@ Board board_load(FILE *file)
       && (fread(&height, sizeof(int), 1, file) == 1) )
   {
     self = board_create(width, height);
-    if (   fread(self.board, sizeof(BoarCellContainer), width*height, file)
+    if (   fread(self.board, sizeof(self.board[0]), width*height, file)
         == width*height)
     {
       return(self);
@@ -106,20 +106,4 @@ Board board_load(FILE *file)
   fprintf(stderr,"Can not load board file.");
   assert(0);
   return(self);
-}
-
-
-int board_validMove(Board *self, BoardCoord coord)
-{ 
-/// to be implemented
-}
-
-int board_movesPossible(Board *self)
-{
-/// to be implemented
-}
-
-BoardCell board_winner(Board *self)
-{
-/// to be implemented
 }

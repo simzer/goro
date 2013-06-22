@@ -1,7 +1,7 @@
 
 #include  "ui.h"
 
-void ui_move(BoardCoord *coord, Game *game, Board *board)
+void ui_move(BoardCoord *coord, Game *game)
 {
   char c;
   int  n;
@@ -10,5 +10,5 @@ void ui_move(BoardCoord *coord, Game *game, Board *board)
     scanf ("%c%d", &c, &n);
     coord->col = c - 'a';
     coord->row = n - 1;
-  } while (!board_validMove(board, *coord));
+  } while (!game->validMove(game, *coord));
 }
