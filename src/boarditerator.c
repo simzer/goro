@@ -1,27 +1,17 @@
 
 #include "boarditerator.h"
 
-board_iterator *board_iterator_create(board *boardToIterate)
+BoardIterator boardIterator_create(Board *boardToIterate)
 {
-  board_iterator *res = malloc(sizeof(board_iterator));
-  if (res == NULL)
-  {
-      fprintf(stderr, "Out of memory.\n");
-      exit(1);
-  }
-  res->row = 0;
-  res->col = 0;
-  res->run = 0;
-  res->board = boardToIterate;
+  BoardIterator res;
+  res.row = 0;
+  res.col = 0;
+  res.run = 0;
+  res.board = boardToIterate;
   return res;
 }
 
-void board_iterator_destruct(board_iterator *self)
-{
-  free(self);
-}
-
-int board_iterator_next(int *row, int *col, int **pcell, board_iterator *self)
+int boardIterator_next(BoardIterator *self)
 {
   if (!self->run)
   {
@@ -41,9 +31,5 @@ int board_iterator_next(int *row, int *col, int **pcell, board_iterator *self)
       self->run = 0;
     }
   }
-  *row  = self->row;
-  *col  = self->col;
-  *pcell = &(self->board->board[self->row*self->board->width
-                                    + self->col]);
   return(self->run);
 }

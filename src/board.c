@@ -2,53 +2,54 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "board.h"
 
-const char board_signs[] = { ' ', 'X', 'O'};
+const char board_signs[] = { ' ', '0', 'O'};
 
-board *board_create(int width,
-                    int height)
+Board board_create(BoardSize width,
+                   BoardSize height)
 {
-  board *self = malloc(sizeof(board));
-  if (self == NULL) return(NULL);
-  self->width  = width;
-  self->height = height;
-  self->board  = malloc(width * height * sizeof(int));
-  board_clear(self);
-  return(self);
+  Board self;
+  self.width  = width;
+  self.height = height;
+  self.board  = malloc(width * height * sizeof(BoarCellContainer));
+  assert(self.board != 0);
+  board_clear(&self);
+  return self;
 }
 
-void board_clear(board *self)
+void board_clear(Board *self)
 {
-  memset(self->board, 0, self->width * self->height * sizeof(int));
+  memset(self->board, 0,
+         self->width * self->height * sizeof(BoarCellContainer));
 }
 
-board *board_copy(board *self)
+Board board_copy(Board *self)
 {
-  board *res = board_create(self->width, self->height);
-  if (res == NULL) return (NULL);
-  memcpy(res->board, self->board, self->width * self->height * sizeof(int));
+  Board res = board_create(self->width, self->height);
+  memcpy(res.board, self->board,
+         self->width * self->height * sizeof(BoarCellContainer));
   return(res);
 }
 
-void board_destruct(board *self)
+void board_destruct(Board *self)
 {
   free(self->board);
-  free(self);
 }
 
-int board_get_cell(board *self, int row, int col)
+BoardCell board_getCell(Board *self, BoardSize row, BoardSize col)
 {
   if (   row < 0 || row >= self->height
       || col < 0 || col >= self->width) {
-    return(board_invalid_cell);
+    return(boardCell_invalid);
   } else {
     return(self->board[row*self->width + col]);
   }
 }
 
-int board_set_cell(board *self, int row, int col, int cell)
+int board_setCell(Board *self, BoardSize row, BoardSize col, BoardCell cell)
 {
   if (   row < 0 || row >= self->height
       || col < 0 || col >= self->width)
@@ -58,26 +59,27 @@ int board_set_cell(board *self, int row, int col, int cell)
   return(0);
 }
 
-void board_print(board *self)
+void board_print(Board *self)
 {
-  int row, col;
+  BoardSize row, col;
   for(row = 0; row < self->height; row++)
   {
     for(col = 0; col < self->width; col++)
     {
-      printf("%c ", board_signs[board_get_cell(self, row, col)]);
+      printf("%c ", board_signs[board_getCell(self, row, col)]);
     }
     printf("\n");
   }
 }
 
-void board_save(FILE *file, board *self)
+void board_save(FILE *file, Board *self)
 {
-  int width  = self->width;
-  int height = self->height;
+  BoardSize width  = self->width;
+  BoardSize height = self->height;
   if(    ( fwrite(&width,       sizeof(int), 1, file) == 1 )
       && ( fwrite(&height,      sizeof(int), 1, file) == 1 )
-      && ( fwrite(self->board, sizeof(int), width*height, file) == width*height) )
+      && ( fwrite(self->board, sizeof(BoarCellContainer),
+                  width*height, file) == width*height) )
   {
     return;
   }
@@ -88,36 +90,38 @@ void board_save(FILE *file, board *self)
   }
 }
 
-board *board_load(FILE *file)
+Board board_load(FILE *file)
 {
-  int width, height;
-  board *self;
+  BoardSize width, height;
+  Board self;
   if (   (fread(&width,  sizeof(int), 1, file) == 1)
       && (fread(&height, sizeof(int), 1, file) == 1) )
   {
     self = board_create(width, height);
-    if (fread(self->board, sizeof(int), width*height, file) == width*height)
+    if (   fread(self.board, sizeof(BoarCellContainer), width*height, file)
+        == width*height)
     {
       return(self);
     }
-    board_destruct(self);
+    board_destruct(&self);
   }
-  printf(stderr,"Can not load board file.");
-  return(NULL);
+  fprintf(stderr,"Can not load board file.");
+  assert(0);
+  return(self);
 }
 
 
-int board_validMove(int i, int j, board *self)
+int board_validMove(BoardSize row, BoardSize col, Board *self)
 { 
 /// to be implemented
 }
 
-int board_movesPossible(board *self)
+int board_movesPossible(Board *self)
 {
 /// to be implemented
 }
 
-player board_winner(board *self)
+BoardCell board_winner(Board *self)
 {
 /// to be implemented
 }

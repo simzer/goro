@@ -6,60 +6,59 @@
 
 double ai_mcThreshold = 0.0;
 
-static int ai_minimax(int *i, int *j, 
-                       game *actGame, 
-                       game *origGame, 
-                       board *actBoard)
+static int ai_minimax(int *row, int *col, 
+                      Game *game,
+                      Game *origGame,
+                      Board *board)
 {
   int result;
-  player winner = board_winner(actBoard);
-  if (   board_movesPossible(actBoard)
-      && (winner == PLAYER_NONE) )
+  Player winner = board_winner(board);
+  if (   board_movesPossible(board)
+      && (winner == player_none) )
   {
     int score;
-    int extrScore = actGame->actPlayer == origGame->actPlayer ? -0x8000 : 0x7FFF;
-    int extrI, extrJ;
-    boardIterator iter;
-    for(boardIterator_init(&iter);
-        !boardIterator_finished(&iter);
-        boardIterator_next(&iter)) 
+    int extrScore = game->actPlayer == origGame->actPlayer ? -0x8000 : 0x7FFF;
+    int extrRow, extrCol;
+    BoardIterator iter = boardIterator_create(board);
+    for(;boardIterator_next(&iter);)
     {
-      int nextI, nextJ;
-      boardIterator_get(&nextI, &nextJ, &iter);
-      if (board_validMove(nextI, nextJ, actBoard)
+      int nextRow, nextCol;
+      nextRow = iter.col;
+      nextCol = iter.row;
+      if (board_validMove(nextRow, nextCol, board)
           && (ai_mcThreshold < ((double)rand()/RAND_MAX))
          ) {
-        int tmpI, tmpJ;
-        board nextBoard;
-        game  nextGame = *actGame;
-        board_copy(&nextBoard, actBoard);
+        BoardSize tmpI, tmpJ;
+        Board nextBoard;
+        Game nextGame = *game;
+        nextBoard = board_copy(board);
         game_switchPlayer(&nextGame);
-        board_move(nextI, nextJ, actGame->actPlayer, &nextBoard);
-        score = ai_minimax(&tmpI, &tmpJ, &nextGame, origGame,  &nextBoard);
-        if ( actGame->actPlayer == origGame->actPlayer 
+        board_setCell(&nextBoard, nextRow, nextCol, game->actPlayer);
+        score = ai_minimax(&tmpI, &tmpJ, &nextGame, origGame, &nextBoard);
+        board_destruct(&nextBoard);
+        if ( game->actPlayer == origGame->actPlayer
             ? (score > extrScore) 
             : (score < extrScore) ) 
         { 
           extrScore = score;
-          extrI = nextI;
-          extrJ = nextJ;
+          extrRow = nextRow;
+          extrCol = nextCol;
         }
       }
     }  
-    *i = extrI;
-    *j = extrJ; 
+    *row = extrRow;
+    *col = extrCol; 
     result = extrScore;
   } else {
     result = (winner == origGame->actPlayer   ? +1 :
-              winner == PLAYER_NONE           ?  0 : 
+              winner == player_none           ?  0 :
                                                 -1 );
   }
-/*printf("\n");board_print(actBoard);printf("%d\n", result);*/
   return result;
 }
 
-int ai_move(int *i, int *j, game *actGame, board *actBoard)
+void ai_move(BoardSize *i, BoardSize *j, Game *game, Board *board)
 {
-  ai_minimax(i, j, actGame, actGame, actBoard);
-  printf("Player %d step: %c%d\n", actGame->actPlayer, 'a'+*i, 1+*j);
+  ai_minimax(i, j, game, game, board);
+  printf("Player %d step: %c%d\n", game->actPlayer, 'a'+*i, 1+*j);
 }

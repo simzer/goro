@@ -5,6 +5,6 @@
 #include "game.h"
 #include "board.h"
 
-void ui_move(int *i, int *j, game *actGame, board *actBoard);
+void ui_move(BoardSize *i, BoardSize *j, Game *game, Board *board);
 
 #endif

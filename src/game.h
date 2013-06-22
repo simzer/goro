@@ -2,13 +2,13 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
-typedef enum { PLAYER_NONE, PLAYER_X, PLAYER_O } player;
+typedef enum { player_none, player_1, player_2 } Player;
 
-typedef struct game {
-  player actPlayer;
-} game;
+typedef struct {
+  Player actPlayer;
+} Game;
 
-extern void game_init(game *self);
-extern void game_switchPlayer(game *self);
+extern Game game_create();
+extern void game_switchPlayer(Game *self);
 
 #endif

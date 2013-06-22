@@ -1,14 +1,16 @@
 
 #include "game.h"
 
-void game_init(game *self)
+Game game_create()
 {
-  self->actPlayer = PLAYER_NONE;
+  Game self;
+  self.actPlayer = player_none;
+  return self;
 }
 
-void game_switchPlayer(game *self)
+void game_switchPlayer(Game *self)
 {
-  self->actPlayer = (self->actPlayer == PLAYER_X)
-                    ? PLAYER_O 
-                    : PLAYER_X;
+  self->actPlayer = (self->actPlayer == player_1)
+                    ? player_2
+                    : player_1;
 }

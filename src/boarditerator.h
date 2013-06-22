@@ -7,13 +7,12 @@
 typedef struct
 {
   int run;
-  int row;
-  int col;
-  board *board;
-} board_iterator;
+  BoardSize row;
+  BoardSize col;
+  Board *board;
+} BoardIterator;
 
-extern board_iterator *board_iterator_create(board_type *board);
-extern void board_iterator_destruct(board_iterator *self);
-extern int board_iterator_next(int *row, int *col, int **pcell, board_iterator *self);
+extern BoardIterator boardIterator_create(Board *board);
+extern int boardIterator_next(BoardIterator *self);
 
 #endif
