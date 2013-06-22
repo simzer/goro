@@ -1,14 +1,15 @@
 
 #include  "ui.h"
 
-void ui_move(BoardCoord *coord, Game *game)
+BoardCoord ui_move(Game *game)
 {
+  BoardCoord coord;
   char c;
   int  n;
   printf("Player %d step: ", game->actPlayer);
   do {
     scanf ("%c%d", &c, &n);
-    coord->col = c - 'a';
-    coord->row = n - 1;
-  } while (!game->validMove(game, *coord));
+    coord = boardCoord_create(n - 1, c - 'a');
+  } while (!game->validMove(game, coord));
+  return(coord);
 }

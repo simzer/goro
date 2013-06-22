@@ -50,9 +50,11 @@ static int ai_minimax(BoardCoord *coord,
   return result;
 }
 
-void ai_move(BoardCoord *coord, Game *game)
+BoardCoord ai_move(Game *game)
 {
-  ai_minimax(coord, game, game);
+  BoardCoord coord;
+  ai_minimax(&coord, game, game);
   printf("Player %d step: %c%d\n",
-         game->actPlayer, 'a'+coord->col, 1+coord->row);
+         game->actPlayer, 'a'+coord.col, 1+coord.row);
+  return(coord);
 }

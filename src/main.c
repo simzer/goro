@@ -9,7 +9,7 @@
 
 int main(void)
 {
-  Game game = gomoko_create(board_create(19,19));
+  Game game = tictactoe_create(3);
   BoardCoord coord;
   Player winner;
   while(winner = game.winner(&game),
@@ -18,11 +18,7 @@ int main(void)
   {
     game_switchPlayer(&game);
     board_print(&game.board);
-    if (game.actPlayer == player_1) {
-      ui_move(&coord, &game);
-    } else {
-      ai_move(&coord, &game);
-    }
+    coord = (game.actPlayer == player_1) ? ui_move(&game) : ai_move(&game);
     board_setCell(&game.board, coord, game_actPlayerCell(&game));
   }
   board_print(&game.board);

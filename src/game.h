@@ -26,6 +26,7 @@ extern Game game_copy(Game *self);
 extern void game_switchPlayer(Game *self);
 extern BoardCell game_actPlayerCell(Game *self);
 
+extern Game tictactoe_create(BoardSize size);
 extern Game gomoko_create(Board board);
 
 #endif

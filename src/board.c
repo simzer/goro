@@ -11,6 +11,13 @@ const BoardCoord boardCoord_null = { 0, 0 };
 
 const char board_signs[] = { '.', '0', 'O'};
 
+BoardCoord boardCoord_create(BoardSize row, BoardSize col) {
+  BoardCoord self;
+  self.row = row;
+  self.col = col;
+  return self;
+}
+
 Board board_create(BoardSize width,
                    BoardSize height)
 {
@@ -25,7 +32,7 @@ Board board_create(BoardSize width,
 
 void board_clear(Board *self)
 {
-  memset(self->board, 0,
+  memset(self->board, boardCell_empty,
          self->width * self->height * sizeof(self->board[0]));
 }
 

@@ -18,6 +18,7 @@ typedef struct {
   BoardSize col;
 } BoardCoord;
 extern const BoardCoord boardCoord_null;
+extern BoardCoord boardCoord_create(BoardSize row, BoardSize col);
 
 typedef struct {
   BoardSize width;

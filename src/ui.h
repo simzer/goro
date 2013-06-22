@@ -5,6 +5,6 @@
 #include "game.h"
 #include "board.h"
 
-void ui_move(BoardCoord *coord, Game *game);
+extern BoardCoord ui_move(Game *game);
 
 #endif
