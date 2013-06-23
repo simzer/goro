@@ -5,13 +5,19 @@
 static int tictactoe_validMove(Game *self, BoardCoord coord);
 static int tictactoe_movesPossible(Game *self);
 static Player tictactoe_winner(Game *self);
+static double tictactoe_evalPosition(Game *self);
+
+static const Game_vtable tictactoe_vtable = {
+  &tictactoe_validMove,
+  &tictactoe_movesPossible,
+  &tictactoe_winner,
+  &tictactoe_evalPosition
+};
 
 Game tictactoe_create(BoardSize size)
 {
   Game self = game_create(board_create(size, size));
-  self.movesPossible = &tictactoe_movesPossible;
-  self.validMove = &tictactoe_validMove;
-  self.winner = &tictactoe_winner;
+  self.vtable = &tictactoe_vtable;
   return self;
 }
 
@@ -55,4 +61,12 @@ static Player tictactoe_winner(Game *self)
     if (fullLeftDiagonal || fullRightDiagonal) return(player);
   }
   return(player_none);
+}
+
+static double tictactoe_evalPosition(Game *self)
+{
+  Player winner = self->vtable->winner(self);
+  return (winner == self->actPlayer ? +1 :
+          winner == player_none     ?  0 :
+                                      -1 );
 }

@@ -9,6 +9,7 @@ function test {
   fi
 }
 
+cmake -DCMAKE_BUILD_TYPE:STRING=Debug .
 make all \
 && test "--tictactoe" "a1\na2\nc1\nb3\nc3\n" "Nobody" \
-&& test "--tictactoe" "a1\na2\nb3\n" "\"Player 1\""
+&& test "--tictactoe" "a1\na2\nb3\n" "Second"

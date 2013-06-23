@@ -1,12 +1,13 @@
 
 #include <stdlib.h>
+#include <math.h>
 
 #include "boarditerator.h"
 #include "ai.h"
 
-static int miniMax_search(MiniMax *self,
-                          BoardCoord *coord,
-                          Game *game);
+static double miniMax_search(MiniMax *self,
+                             BoardCoord *coord,
+                             Game *game);
 
 MiniMax miniMax_create(Game *game) {
   MiniMax self;
@@ -15,22 +16,22 @@ MiniMax miniMax_create(Game *game) {
   return self;
 }
 
-static int miniMax_search(MiniMax *self,
+static double miniMax_search(MiniMax *self,
                           BoardCoord *coord,
                           Game *game)
 {
-  int result;
-  Player winner = game->winner(game);
-  if (   game->movesPossible(game)
+  double result;
+  Player winner = game->vtable->winner(game);
+  if (   game->vtable->movesPossible(game)
       && (winner == player_none) )
   {
-    int score;
-    int extrScore = game->actPlayer == self->game->actPlayer ? -0x8000 : 0x7FFF;
+    double score;
+    double extrScore = game->actPlayer == self->game->actPlayer ? -INFINITY : INFINITY;
     BoardCoord extrCoord;
     BoardIterator iter = boardIterator_create(&game->board);
     for(;boardIterator_next(&iter);)
     {
-      if (game->validMove(game, iter.coord)
+      if (game->vtable->validMove(game, iter.coord)
           && (self->monteCarloThreshold < ((double)rand()/RAND_MAX))
          ) {
         BoardCoord tmpCoord;
@@ -40,20 +41,19 @@ static int miniMax_search(MiniMax *self,
         score = miniMax_search(self, &tmpCoord, &nextGame);
         board_destruct(&nextGame.board);
         if ( game->actPlayer == self->game->actPlayer
-            ? (score > extrScore) 
-            : (score < extrScore) ) 
-        { 
+            ? (score > extrScore)
+            : (score < extrScore) )
+        {
           extrScore = score;
           extrCoord = iter.coord;
         }
       }
-    }  
+    }
     *coord = extrCoord;
     result = extrScore;
   } else {
-    result = (winner == self->game->actPlayer ? +1 :
-              winner == player_none           ?  0 :
-                                                -1 );
+    result = (game->actPlayer == self->game->actPlayer ? 1 : -1)
+             * game->vtable->evalPosition(game);
   }
   return result;
 }

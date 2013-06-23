@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
   }
   MiniMax miniMax = miniMax_create(&game);
   Player winner;
-  while(winner = game.winner(&game),
+  while(winner = game.vtable->winner(&game),
         (   winner == player_none
-         && game.movesPossible(&game)) )
+         && game.vtable->movesPossible(&game)) )
   {
     BoardCoord coord;
     game_switchPlayer(&game);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
   board_print(&game.board);
   printf(winner == player_none
          ? "Nobody won!\n"
-         : "Player %d won!\n", winner);
-  
+         : "%s won!\n", game_playerNames[winner]);
+
   return 0;
 }

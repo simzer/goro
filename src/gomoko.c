@@ -5,14 +5,19 @@
 static int gomoko_validMove(Game *self, BoardCoord coord);
 static int gomoko_movesPossible(Game *self);
 static Player gomoko_winner(Game *self);
+static double gomoko_evalPosition(Game *self);
+
+static const Game_vtable gomoko_vtable = {
+  &gomoko_validMove,
+  &gomoko_movesPossible,
+  &gomoko_winner,
+  &gomoko_evalPosition
+};
 
 Game gomoko_create(Board board)
 {
-  Game self;
-  self = game_create(board);
-  self.movesPossible = &gomoko_movesPossible;
-  self.validMove = &gomoko_validMove;
-  self.winner = &gomoko_winner;
+  Game self = game_create(board);
+  self.vtable = &gomoko_vtable;
   return self;
 }
 
@@ -54,3 +59,6 @@ static Player gomoko_winner(Game *self)
   return(player_none);
 }
 
+static double gomoko_evalPosition(Game *self) {
+  return 0;
+}

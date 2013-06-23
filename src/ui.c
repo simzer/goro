@@ -10,6 +10,6 @@ BoardCoord ui_move(Game *game)
   do {
     scanf ("%c%d", &c, &n);
     coord = boardCoord_create(n - 1, c - 'a');
-  } while (!game->validMove(game, coord));
+  } while (!game->vtable->validMove(game, coord));
   return(coord);
 }

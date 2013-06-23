@@ -6,6 +6,11 @@ const BoardCell game_playerCells[player_num] = {
   boardCell_white
 };
 
+char *game_playerNames[player_num] = {
+  "First player",
+  "Second Player"
+};
+
 BoardCell game_actPlayerCell(Game *self)
 {
   return game_playerCells[self->actPlayer];
