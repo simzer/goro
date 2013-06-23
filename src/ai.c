@@ -5,9 +5,12 @@
 #include "boarditerator.h"
 #include "ai.h"
 
-static double miniMax_search(MiniMax *self,
+static double miniMax_search(const MiniMax *self,
                              BoardCoord *coord,
                              Game *game);
+
+const double miniMax_winScore = INFINITY;
+const double miniMax_loseScore = -INFINITY;
 
 MiniMax miniMax_create(Game *game) {
   MiniMax self;
@@ -16,9 +19,9 @@ MiniMax miniMax_create(Game *game) {
   return self;
 }
 
-static double miniMax_search(MiniMax *self,
-                          BoardCoord *coord,
-                          Game *game)
+static double miniMax_search(const MiniMax *self,
+                             BoardCoord *coord,
+                             Game *game)
 {
   double result;
   Player winner = game->vtable->winner(game);
@@ -26,8 +29,8 @@ static double miniMax_search(MiniMax *self,
       && (winner == player_none) )
   {
     double score;
-    double extrScore = game->actPlayer == self->game->actPlayer ? -INFINITY : INFINITY;
-    BoardCoord extrCoord;
+    double maxScore = -INFINITY;
+    BoardCoord maxScoredCoord;
     BoardIterator iter = boardIterator_create(&game->board);
     for(;boardIterator_next(&iter);)
     {
@@ -38,22 +41,18 @@ static double miniMax_search(MiniMax *self,
         Game nextGame = game_copy(game);
         game_switchPlayer(&nextGame);
         board_setCell(&nextGame.board, iter.coord, game_actPlayerCell(game));
-        score = miniMax_search(self, &tmpCoord, &nextGame);
+        score = - miniMax_search(self, &tmpCoord, &nextGame);
         board_destruct(&nextGame.board);
-        if ( game->actPlayer == self->game->actPlayer
-            ? (score > extrScore)
-            : (score < extrScore) )
-        {
-          extrScore = score;
-          extrCoord = iter.coord;
+        if (score > maxScore) {
+          maxScore = score;
+          maxScoredCoord = iter.coord;
         }
       }
     }
-    *coord = extrCoord;
-    result = extrScore;
+    *coord = maxScoredCoord;
+    result = maxScore;
   } else {
-    result = (game->actPlayer == self->game->actPlayer ? 1 : -1)
-             * game->vtable->evalPosition(game);
+    result = game->vtable->evalPosition(game);
   }
   return result;
 }

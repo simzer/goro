@@ -27,7 +27,7 @@ struct Game {
 };
 
 extern const BoardCell game_playerCells[player_num];
-extern char *game_playerNames[player_num];
+extern const char *game_playerNames[player_num];
 extern Game game_create(Board board);
 extern Game game_copy(Game *self);
 extern void game_switchPlayer(Game *self);

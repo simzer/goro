@@ -6,7 +6,7 @@ const BoardCell game_playerCells[player_num] = {
   boardCell_white
 };
 
-char *game_playerNames[player_num] = {
+const char *game_playerNames[player_num] = {
   "First player",
   "Second Player"
 };

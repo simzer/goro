@@ -10,6 +10,9 @@ typedef struct MiniMax {
   double monteCarloThreshold;
 } MiniMax;
 
+extern const double miniMax_winScore;
+extern const double miniMax_loseScore;
+
 extern MiniMax miniMax_create(Game *game);
 extern BoardCoord miniMax_move(MiniMax *self);
 
