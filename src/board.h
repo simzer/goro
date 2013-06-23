@@ -4,6 +4,8 @@
 
 #include "stdio.h"
 
+typedef enum BoardDirection BoardDirection;
+
 typedef enum BoardCell {
   boardCell_empty = 0,
   boardCell_black = 1,
@@ -20,6 +22,26 @@ typedef struct {
 extern const BoardCoord boardCoord_null;
 extern BoardCoord boardCoord_create(BoardSize row, BoardSize col);
 extern BoardCoord boardCoord_add(BoardCoord *self, BoardCoord *add);
+extern int boardCoord_equal(BoardCoord *self, BoardCoord *reference);
+extern BoardCoord boardCoord_neighbour(BoardCoord *self,
+                                       BoardDirection direction,
+                                       BoardSize distance);
+
+enum BoardDirection {
+  boardDirection_fullRoundBegin,
+  boardDirection_northWest = 0,
+  boardDirection_north     = 1,
+  boardDirection_northEast = 2,
+  boardDirection_west      = 3,
+  boardDirection_halfRoundBegin,
+  boardDirection_east      = 4,
+  boardDirection_southWest = 5,
+  boardDirection_south     = 6,
+  boardDirection_southEast,
+  boardDirection_roundEnd  = 7,
+  boardDirection_number    = 8
+};
+extern const BoardCoord boardDirection_coords[boardDirection_number];
 
 typedef struct {
   BoardSize width;

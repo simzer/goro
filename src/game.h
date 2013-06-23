@@ -22,7 +22,7 @@ typedef struct Game_vtable {
 } Game_vtable;
 
 struct Game {
-  Player actPlayer;
+  Player actualPlayer;
   Board board;
   const Game_vtable *vtable;
 };

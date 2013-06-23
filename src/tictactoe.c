@@ -69,7 +69,7 @@ static Player tictactoe_winner(Game *self)
 static double tictactoe_evalPosition(Game *self)
 {
   Player winner = self->vtable->winner(self);
-  return (winner == self->actPlayer ? miniMax_winScore :
+  return (winner == self->actualPlayer ? miniMax_winScore :
           winner == player_none     ? 0 :
                                       miniMax_loseScore );
 }

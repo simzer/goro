@@ -11,6 +11,12 @@ const BoardCoord boardCoord_null = { 0, 0 };
 
 const char board_signs[] = { '.', '@', 'O'};
 
+const BoardCoord boardDirection_coords[boardDirection_number] = {
+  { -1, -1 }, { -1, 0 }, { -1, 1 },
+  {  0, -1 },            {  0, 1 },
+  {  1, -1 }, {  1, 0 }, {  1, 1 }
+};
+
 BoardCoord boardCoord_create(BoardSize row, BoardSize col) {
   BoardCoord self;
   self.row = row;
@@ -23,6 +29,21 @@ BoardCoord boardCoord_add(BoardCoord *self, BoardCoord *add) {
   res.row += add->row;
   res.col += add->col;
   return res;
+}
+
+BoardCoord boardCoord_neighbour(BoardCoord *self,
+                                BoardDirection direction,
+                                BoardSize distance)
+{
+  BoardCoord neighbour = *self;
+  neighbour.col += distance * boardDirection_coords[direction].col;
+  neighbour.row += distance * boardDirection_coords[direction].row;
+  return(neighbour);
+}
+
+int boardCoord_equal(BoardCoord *self, BoardCoord *reference) {
+  return    (self->row == reference->row)
+         && (self->col == reference->col);
 }
 
 Board board_create(BoardSize width,

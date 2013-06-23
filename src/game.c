@@ -13,13 +13,13 @@ const char *game_playerNames[player_num] = {
 
 BoardCell game_actPlayerCell(Game *self)
 {
-  return game_playerCells[self->actPlayer];
+  return game_playerCells[self->actualPlayer];
 }
 
 Game game_create(Board board)
 {
   Game self;
-  self.actPlayer = player_none;
+  self.actualPlayer = player_none;
   self.board = board;
   return self;
 }
@@ -33,7 +33,7 @@ Game game_copy(Game *self)
 
 void game_switchPlayer(Game *self)
 {
-  self->actPlayer = (self->actPlayer == player_1)
+  self->actualPlayer = (self->actualPlayer == player_1)
                     ? player_2
                     : player_1;
 }

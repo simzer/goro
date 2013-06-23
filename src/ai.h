@@ -8,6 +8,7 @@
 typedef struct MiniMax {
   Game *game;
   double monteCarloThreshold;
+  int lookahead;
 } MiniMax;
 
 extern const double miniMax_winScore;
