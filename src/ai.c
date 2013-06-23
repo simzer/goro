@@ -31,21 +31,18 @@ static double miniMax_search(const MiniMax *self,
     double score;
     double maxScore = -INFINITY;
     BoardCoord maxScoredCoord;
-    BoardIterator iter = boardIterator_create(&game->board);
-    for(;boardIterator_next(&iter);)
-    {
-      if (game->vtable->validMove(game, iter.coord)
-          && (self->monteCarloThreshold < ((double)rand()/RAND_MAX))
-         ) {
+    BoardIterator iterator = boardIterator_create(&game->board);
+    for(;game_nextValidMove(game, &iterator);) {
+      if (self->monteCarloThreshold < ((double)rand()/RAND_MAX)) {
         BoardCoord tmpCoord;
         Game nextGame = game_copy(game);
         game_switchPlayer(&nextGame);
-        board_setCell(&nextGame.board, iter.coord, game_actPlayerCell(game));
+        board_setCell(&nextGame.board, iterator.coord, game_actPlayerCell(game));
         score = - miniMax_search(self, &tmpCoord, &nextGame);
         board_destruct(&nextGame.board);
         if (score > maxScore) {
           maxScore = score;
-          maxScoredCoord = iter.coord;
+          maxScoredCoord = iterator.coord;
         }
       }
     }

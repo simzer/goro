@@ -3,6 +3,7 @@
 #define __GAME_H__
 
 #include "board.h"
+#include "boarditerator.h"
 
 typedef enum {
   player_none = -1,
@@ -32,5 +33,6 @@ extern Game game_create(Board board);
 extern Game game_copy(Game *self);
 extern void game_switchPlayer(Game *self);
 extern BoardCell game_actPlayerCell(Game *self);
+extern int game_nextValidMove(Game *self, BoardIterator *iterator);
 
 #endif

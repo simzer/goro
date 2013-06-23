@@ -37,3 +37,13 @@ void game_switchPlayer(Game *self)
                     ? player_2
                     : player_1;
 }
+
+int game_nextValidMove(Game *self, BoardIterator *iterator)
+{
+  int result;
+  do {
+    result = boardIterator_next(iterator);
+  } while(   (result == 1)
+          && !self->vtable->validMove(self, iterator->coord));
+  return result;
+}
