@@ -8,6 +8,6 @@
 
 #include "game.h"
 
-extern Game tictactoe_create(BoardSize size);
+extern Game createTicTacToe(BoardSize size);
 
 #endif

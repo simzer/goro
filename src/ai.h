@@ -15,10 +15,10 @@ typedef struct MiniMax {
   int lookahead;
 } MiniMax;
 
-extern const double miniMax_winScore;
-extern const double miniMax_loseScore;
+extern const double miniMaxWinScore;
+extern const double miniMaxLoseScore;
 
-extern MiniMax miniMax_create(Game *game);
-extern BoardCoord miniMax_move(MiniMax *self);
+extern MiniMax createMiniMax(Game *game);
+extern BoardCoord getMiniMaxMove(MiniMax *self);
 
 #endif

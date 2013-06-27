@@ -5,48 +5,48 @@
 
 #include "game.h"
 
-const BoardCell game_playerCells[player_num] = {
-  boardCell_black,
-  boardCell_white
+const BoardCell gamePlayerCells[numberOfPlayers] = {
+  blackBoardCell,
+  whiteBoardCell
 };
 
-const char *game_playerNames[player_num] = {
+const char *gamePlayerNames[numberOfPlayers] = {
   "First player",
   "Second Player"
 };
 
-BoardCell game_actPlayerCell(Game *self)
+BoardCell actualGamePlayerCell(Game *self)
 {
-  return game_playerCells[self->actualPlayer];
+  return gamePlayerCells[self->actualPlayer];
 }
 
-Game game_create(Board board)
+Game createGame(Board board)
 {
   Game self;
-  self.actualPlayer = player_none;
+  self.actualPlayer = noPlayer;
   self.board = board;
   return self;
 }
 
-Game game_copy(Game *self)
+Game copyGame(Game *self)
 {
-  Game res = *self;
-  res.board = board_copy(&(self->board));
-  return(res);
+  Game game = *self;
+  game.board = copyBoard(&(self->board));
+  return(game);
 }
 
-void game_switchPlayer(Game *self)
+void switchGamePlayer(Game *self)
 {
-  self->actualPlayer = (self->actualPlayer == player_1)
-                    ? player_2
-                    : player_1;
+  self->actualPlayer = (self->actualPlayer == firstPlayer)
+                    ? secondPlayer
+                    : firstPlayer;
 }
 
-int game_nextValidMove(Game *self, BoardIterator *iterator)
+int nextValidGameMove(Game *self, BoardIterator *iterator)
 {
   int result;
   do {
-    result = boardIterator_next(iterator);
+    result = !boardIteratorFinished(iterator);
   } while(   (result == 1)
           && !self->vtable->validMove(self, iterator->coord));
   return result;

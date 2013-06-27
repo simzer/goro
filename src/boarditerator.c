@@ -5,16 +5,16 @@
 
 #include "boarditerator.h"
 
-BoardIterator boardIterator_create(Board *boardToIterate)
+BoardIterator createBoardIterator(Board *boardToIterate)
 {
-  BoardIterator res;
-  res.coord = boardCoord_null;
-  res.run = 0;
-  res.board = boardToIterate;
-  return res;
+  BoardIterator iterator;
+  iterator.coord = nullBoardCoord;
+  iterator.run = 0;
+  iterator.board = boardToIterate;
+  return iterator;
 }
 
-int boardIterator_next(BoardIterator *self)
+int boardIteratorFinished(BoardIterator *self)
 {
   if (!self->run)
   {

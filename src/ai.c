@@ -9,15 +9,15 @@
 #include "boarditerator.h"
 #include "ai.h"
 
-static double miniMax_search(const MiniMax *self,
-                             BoardCoord *coord,
-                             Game *game,
-                             int lookahead);
+static double searchMaxScore(const MiniMax *self,
+                            BoardCoord *coord,
+                            Game *game,
+                            int lookahead);
 
-const double miniMax_winScore = INFINITY;
-const double miniMax_loseScore = -INFINITY;
+const double miniMaxWinScore = INFINITY;
+const double miniMaxLoseScore = -INFINITY;
 
-MiniMax miniMax_create(Game *game) {
+MiniMax createMiniMax(Game *game) {
   MiniMax self;
   self.monteCarloThreshold = 0.0;
   self.lookahead = 3;
@@ -25,29 +25,29 @@ MiniMax miniMax_create(Game *game) {
   return self;
 }
 
-static double miniMax_search(const MiniMax *self,
-                             BoardCoord *coord,
-                             Game *game,
-                             int lookahead)
+static double searchMaxScore(const MiniMax *self,
+                            BoardCoord *coord,
+                            Game *game,
+                            int lookahead)
 {
   double result;
   Player winner = game->vtable->winner(game);
   if (   game->vtable->movesPossible(game)
-      && (winner == player_none)
+      && (winner == noPlayer)
       && (lookahead > 0))
   {
     double score;
     double maxScore = -INFINITY;
     BoardCoord maxScoredCoord;
-    BoardIterator iterator = boardIterator_create(&game->board);
-    for(;game_nextValidMove(game, &iterator);) {
+    BoardIterator iterator = createBoardIterator(&game->board);
+    for(;nextValidGameMove(game, &iterator);) {
       if (self->monteCarloThreshold < ((double)rand()/RAND_MAX)) {
-        BoardCoord tmpCoord;
-        Game nextGame = game_copy(game);
-        game_switchPlayer(&nextGame);
-        board_setCell(&nextGame.board, iterator.coord, game_actPlayerCell(game));
-        score = - miniMax_search(self, &tmpCoord, &nextGame, lookahead-1);
-        board_destruct(&nextGame.board);
+        BoardCoord ignoredCoord;
+        Game nextGame = copyGame(game);
+        switchGamePlayer(&nextGame);
+        setBoardCell(&nextGame.board, iterator.coord, actualGamePlayerCell(game));
+        score = - searchMaxScore(self, &ignoredCoord, &nextGame, lookahead-1);
+        destructBoard(&nextGame.board);
         if (score > maxScore) {
           maxScore = score;
           maxScoredCoord = iterator.coord;
@@ -62,9 +62,9 @@ static double miniMax_search(const MiniMax *self,
   return result;
 }
 
-BoardCoord miniMax_move(MiniMax *self)
+BoardCoord getMiniMaxMove(MiniMax *self)
 {
   BoardCoord coord;
-  miniMax_search(self, &coord, self->game, self->lookahead);
+  searchMaxScore(self, &coord, self->game, self->lookahead);
   return(coord);
 }

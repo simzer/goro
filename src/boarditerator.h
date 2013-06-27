@@ -15,7 +15,7 @@ typedef struct
   Board *board;
 } BoardIterator;
 
-extern BoardIterator boardIterator_create(Board *board);
-extern int boardIterator_next(BoardIterator *self);
+extern BoardIterator createBoardIterator(Board *board);
+extern int boardIteratorFinished(BoardIterator *self);
 
 #endif

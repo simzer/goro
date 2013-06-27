@@ -10,33 +10,33 @@
 #include "boarditerator.h"
 
 typedef enum {
-  player_none = -1,
-  player_1 = 0,
-  player_2 = 1,
-  player_num = 2
+  noPlayer = -1,
+  firstPlayer = 0,
+  secondPlayer = 1,
+  numberOfPlayers = 2
 } Player;
 
 typedef struct Game Game;
 
-typedef struct Game_vtable {
+typedef struct GameVirtualTable {
   int (*validMove)(Game *self, BoardCoord coord);
   int (*movesPossible)(Game *self);
   Player (*winner)(Game *self);
   double (*evalPosition)(Game *self);
-} Game_vtable;
+} GameVirtualTable;
 
 struct Game {
   Player actualPlayer;
   Board board;
-  const Game_vtable *vtable;
+  const GameVirtualTable *vtable;
 };
 
-extern const BoardCell game_playerCells[player_num];
-extern const char *game_playerNames[player_num];
-extern Game game_create(Board board);
-extern Game game_copy(Game *self);
-extern void game_switchPlayer(Game *self);
-extern BoardCell game_actPlayerCell(Game *self);
-extern int game_nextValidMove(Game *self, BoardIterator *iterator);
+extern const BoardCell gamePlayerCells[numberOfPlayers];
+extern const char *gamePlayerNames[numberOfPlayers];
+extern Game createGame(Board board);
+extern Game copyGame(Game *self);
+extern void switchGamePlayer(Game *self);
+extern BoardCell actualGamePlayerCell(Game *self);
+extern int nextValidGameMove(Game *self, BoardIterator *iterator);
 
 #endif

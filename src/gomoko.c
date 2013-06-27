@@ -8,94 +8,94 @@
 #include "game.h"
 #include "boarditerator.h"
 
-static int gomoko_validMove(Game *self, BoardCoord coord);
-static int gomoko_movesPossible(Game *self);
-static Player gomoko_winner(Game *self);
-static double gomoko_evalPosition(Game *self);
+static int validGomokoMove(Game *self, BoardCoord coord);
+static int possibleGomokoMoves(Game *self);
+static Player gomokoWinner(Game *self);
+static double evalGomokoPosition(Game *self);
 
-static const BoardSize gomoko_winnerRowSize = 5;
+static const BoardSize gomokoWinnerRowSize = 5;
 
-static const Game_vtable gomoko_vtable = {
-  &gomoko_validMove,
-  &gomoko_movesPossible,
-  &gomoko_winner,
-  &gomoko_evalPosition
+static const GameVirtualTable gomokoVirtualtable = {
+  &validGomokoMove,
+  &possibleGomokoMoves,
+  &gomokoWinner,
+  &evalGomokoPosition
 };
 
-Game gomoko_create(Board board)
+Game createGomoko(Board board)
 {
-  Game self = game_create(board);
-  self.vtable = &gomoko_vtable;
+  Game self = createGame(board);
+  self.vtable = &gomokoVirtualtable;
   return self;
 }
 
-static int gomoko_validMove(Game *self, BoardCoord coord)
+static int validGomokoMove(Game *self, BoardCoord coord)
 {
-  return board_getCell(&(self->board), coord) == boardCell_empty;
+  return getBoardCell(&(self->board), coord) == emptyBoardCell;
 }
 
-static int gomoko_movesPossible(Game *self)
+static int possibleGomokoMoves(Game *self)
 {
-  return board_isThereEmptyCell(&self->board);
+  return boardHasEmptyCell(&self->board);
 }
 
-static Player gomoko_winner(Game *self)
+static Player gomokoWinner(Game *self)
 {
   Player player;
-  for(player = player_1; player < player_num; player++) {
-    BoardIterator iter = boardIterator_create(&self->board);
-    for(;boardIterator_next(&iter);) {
+  for(player = firstPlayer; player < numberOfPlayers; player++) {
+    BoardIterator iterator = createBoardIterator(&self->board);
+    while(!boardIteratorFinished(&iterator)) {
       BoardDirection direction;
-      for(direction =  boardDirection_halfRoundBegin;
-          direction <= boardDirection_roundEnd;
+      for(direction =  halfRoundDirectionBegin;
+          direction <= roundDirectionEnd;
           direction++)
       {
         BoardSize distance;
         int winnerAmountInARow = 1;
         for(distance = 0;
-            distance < gomoko_winnerRowSize;
+            distance < gomokoWinnerRowSize;
             distance++)
         {
           BoardCoord neighbour =
-            boardCoord_neighbour(&iter.coord, direction, distance);
+            getBoardCoordNeighbour(&iterator.coord, direction, distance);
           winnerAmountInARow &=
-            board_getCell(&(self->board), neighbour) == game_playerCells[player];
+            getBoardCell(&(self->board), neighbour) == gamePlayerCells[player];
         }
         if (winnerAmountInARow) return(player);
       }
     }
   }
-  return(player_none);
+  return(noPlayer);
 }
 
-static double gomoko_evalPosition(Game *self)
+static double evalGomokoPosition(Game *self)
 {
   enum { friend = 0, enemy = 1 };
   double score;
-  int counters[gomoko_winnerRowSize][2];
+  int counters[gomokoWinnerRowSize][2];
   int side;
-  BoardIterator iterator = boardIterator_create(&(self->board));
-  memset(counters, 0, gomoko_winnerRowSize * 2 * sizeof(counters[0]));
+  BoardIterator iterator = createBoardIterator(&(self->board));
+  memset(counters, 0, gomokoWinnerRowSize * 2 * sizeof(counters[0]));
   // Count connected sections (xx, xxx, xxxx, xxxxx)
-  while(boardIterator_next(&iterator))
+  while(!boardIteratorFinished(&iterator))
   {
     BoardDirection direction;
-    for(direction =  boardDirection_halfRoundBegin;
-        direction <= boardDirection_roundEnd;
+    for(direction =  halfRoundDirectionBegin;
+        direction <= roundDirectionEnd;
         direction++)
     {
       int friends = 0;
       int enemies = 0;
       int distance;
-      for (distance = 0; distance < gomoko_winnerRowSize; distance++)
+      for (distance = 0; distance < gomokoWinnerRowSize; distance++)
       {
         BoardCoord neighbour =
-          boardCoord_neighbour(&iterator.coord, direction, distance);
-        BoardCell cell = board_getCell(&self->board, neighbour);
-        if (cell == game_playerCells[self->actualPlayer]) {
+          getBoardCoordNeighbour(&iterator.coord, direction, distance);
+        BoardCell cell = getBoardCell(&self->board, neighbour);
+        if (cell == gamePlayerCells[self->actualPlayer]) {
           friends++;
-        } else if (   cell != boardCell_empty
-                   && cell != boardCell_invalid) {
+        } else if (   cell != emptyBoardCell
+                   && cell != invalidBoardCell) {
           enemies++;
         }
       }
@@ -109,7 +109,7 @@ static double gomoko_evalPosition(Game *self)
   }
   double weight = 1;
   int distance;
-  for(distance = 3; distance < gomoko_winnerRowSize; distance++) {
+  for(distance = 3; distance < gomokoWinnerRowSize; distance++) {
     score -= counters[distance][friend] * weight;
     weight *= self->board.height * self->board.width;
     score += counters[distance][enemy] * weight;

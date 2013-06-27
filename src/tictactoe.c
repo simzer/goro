@@ -9,71 +9,71 @@
 #include "game.h"
 #include "boarditerator.h"
 
-static int tictactoe_validMove(Game *self, BoardCoord coord);
-static int tictactoe_movesPossible(Game *self);
-static Player tictactoe_winner(Game *self);
-static double tictactoe_evalPosition(Game *self);
+static int validTicTacToeMove(Game *self, BoardCoord coord);
+static int possibleTicTacToeMoves(Game *self);
+static Player ticTacToeWinner(Game *self);
+static double evalTicTacToePosition(Game *self);
 
-static const Game_vtable tictactoe_vtable = {
-  &tictactoe_validMove,
-  &tictactoe_movesPossible,
-  &tictactoe_winner,
-  &tictactoe_evalPosition
+static const GameVirtualTable ticTacToeVirtualTable = {
+  &validTicTacToeMove,
+  &possibleTicTacToeMoves,
+  &ticTacToeWinner,
+  &evalTicTacToePosition
 };
 
-Game tictactoe_create(BoardSize size)
+Game createTicTacToe(BoardSize size)
 {
-  Game self = game_create(board_create(size, size));
-  self.vtable = &tictactoe_vtable;
+  Game self = createGame(createBoard(size, size));
+  self.vtable = &ticTacToeVirtualTable;
   return self;
 }
 
-static int tictactoe_validMove(Game *self, BoardCoord coord)
+static int validTicTacToeMove(Game *self, BoardCoord coord)
 {
-  return board_getCell(&(self->board), coord) == boardCell_empty;
+  return getBoardCell(&(self->board), coord) == emptyBoardCell;
 }
 
-static int tictactoe_movesPossible(Game *self)
+static int possibleTicTacToeMoves(Game *self)
 {
-  return board_isThereEmptyCell(&self->board);
+  return boardHasEmptyCell(&self->board);
 }
 
-static Player tictactoe_winner(Game *self)
+static Player ticTacToeWinner(Game *self)
 {
   BoardSize size = self->board.width;
   BoardSize i, j;
   Player player;
   BoardCoord coord;
-  for(player = player_1; player < player_num; player++) {
+  for(player = firstPlayer; player < numberOfPlayers; player++) {
     int fullLeftDiagonal = 1;
     int fullRightDiagonal = 1;
     for(i = 0; i < size; i++) {
       int fullRow = 1;
       int fullCol = 1;
       for(j = 0; j < size; j++) {
-        fullRow &= board_getCell(&(self->board), boardCoord_create(i, j))
-                    == game_playerCells[player];
-        fullCol &= board_getCell(&(self->board), boardCoord_create(j, i))
-                    == game_playerCells[player];
+        fullRow &= getBoardCell(&(self->board), createBoardCoord(i, j))
+                    == gamePlayerCells[player];
+        fullCol &= getBoardCell(&(self->board), createBoardCoord(j, i))
+                    == gamePlayerCells[player];
       }
       if (fullRow || fullCol) return(player);
 
-      fullLeftDiagonal &= board_getCell(&(self->board),
-                                        boardCoord_create(i, i))
-                          == game_playerCells[player];
-      fullRightDiagonal &= board_getCell(&(self->board),
-                                        boardCoord_create(i, size - 1 - i))
-                           == game_playerCells[player];
+      fullLeftDiagonal &= getBoardCell(&(self->board),
+                                        createBoardCoord(i, i))
+                          == gamePlayerCells[player];
+      fullRightDiagonal &= getBoardCell(&(self->board),
+                                        createBoardCoord(i, size - 1 - i))
+                           == gamePlayerCells[player];
     }
     if (fullLeftDiagonal || fullRightDiagonal) return(player);
   }
-  return(player_none);
+  return(noPlayer);
 }
 
-static double tictactoe_evalPosition(Game *self)
+static double evalTicTacToePosition(Game *self)
 {
   Player winner = self->vtable->winner(self);
-  return (winner == self->actualPlayer ? miniMax_winScore :
-          winner == player_none     ? 0 :
-                                      miniMax_loseScore );
+  return (winner == self->actualPlayer ? miniMaxWinScore :
+          winner == noPlayer     ? 0 :
+                                      miniMaxLoseScore );
 }

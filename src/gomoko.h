@@ -8,6 +8,6 @@
 
 #include "game.h"
 
-extern Game gomoko_create(Board board);
+extern Game createGomoko(Board board);
 
 #endif

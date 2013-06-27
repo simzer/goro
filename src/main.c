@@ -17,32 +17,32 @@
 int main(int argc, char *argv[])
 {
   Game game;
-  MiniMax miniMax = miniMax_create(&game);
+  MiniMax miniMax = createMiniMax(&game);
   Player winner;
   if ((argc > 1) && (strcmp(argv[1], "--tictactoe") == 0)) {
-    game = tictactoe_create(3);
+    game = createTicTacToe(3);
     miniMax.lookahead = 9;
   } else {
-    game = gomoko_create(board_create(9,9));
+    game = createGomoko(createBoard(9,9));
   }
   while(winner = game.vtable->winner(&game),
-        (   winner == player_none
+        (   winner == noPlayer
          && game.vtable->movesPossible(&game)) )
   {
     BoardCoord coord;
-    game_switchPlayer(&game);
-    board_print(&game.board);
-    coord = (game.actualPlayer == player_1)
-            ? ui_move(&game)
-            : miniMax_move(&miniMax);
-    board_setCell(&game.board, coord, game_actPlayerCell(&game));
+    switchGamePlayer(&game);
+    printBoard(&game.board);
+    coord = (game.actualPlayer == firstPlayer)
+            ? getUIMove(&game)
+            : getMiniMaxMove(&miniMax);
+    setBoardCell(&game.board, coord, actualGamePlayerCell(&game));
     printf("Player %d step: %c%d\n",
            game.actualPlayer, 'a'+coord.col, 1+coord.row);
   }
-  board_print(&game.board);
-  printf(winner == player_none
+  printBoard(&game.board);
+  printf(winner == noPlayer
          ? "Nobody won!\n"
-         : "%s won!\n", game_playerNames[winner]);
+         : "%s won!\n", gamePlayerNames[winner]);
 
   return 0;
 }

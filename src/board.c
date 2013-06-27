@@ -11,123 +11,123 @@
 #include "board.h"
 #include "boarditerator.h"
 
-const BoardCoord boardCoord_null = { 0, 0 };
+const BoardCoord nullBoardCoord = { 0, 0 };
 
-const char board_signs[] = { '.', '@', 'O'};
+const char boardSigns[] = { '.', '@', 'O'};
 
-const BoardCoord boardDirection_coords[boardDirection_number] = {
+const BoardCoord directionCoords[directionNumber] = {
   { -1, -1 }, { -1, 0 }, { -1, 1 },
   {  0, -1 },            {  0, 1 },
   {  1, -1 }, {  1, 0 }, {  1, 1 }
 };
 
-BoardCoord boardCoord_create(BoardSize row, BoardSize col) {
+BoardCoord createBoardCoord(BoardSize row, BoardSize col) {
   BoardCoord self;
   self.row = row;
   self.col = col;
   return self;
 }
 
-BoardCoord boardCoord_add(BoardCoord *self, BoardCoord *add) {
-  BoardCoord res = *self;
-  res.row += add->row;
-  res.col += add->col;
-  return res;
+BoardCoord addBoardCoords(BoardCoord *self, BoardCoord *add) {
+  BoardCoord coord = *self;
+  coord.row += add->row;
+  coord.col += add->col;
+  return coord;
 }
 
-BoardCoord boardCoord_neighbour(BoardCoord *self,
-                                BoardDirection direction,
-                                BoardSize distance)
+BoardCoord getBoardCoordNeighbour(BoardCoord *self,
+                                  BoardDirection direction,
+                                  BoardSize distance)
 {
   BoardCoord neighbour = *self;
-  neighbour.col += distance * boardDirection_coords[direction].col;
-  neighbour.row += distance * boardDirection_coords[direction].row;
+  neighbour.col += distance * directionCoords[direction].col;
+  neighbour.row += distance * directionCoords[direction].row;
   return(neighbour);
 }
 
-int boardCoord_equal(BoardCoord *self, BoardCoord *reference) {
+int boardCoordsEqual(BoardCoord *self, BoardCoord *reference) {
   return    (self->row == reference->row)
          && (self->col == reference->col);
 }
 
-Board board_create(BoardSize width,
-                   BoardSize height)
+Board createBoard(BoardSize width,
+                  BoardSize height)
 {
   Board self;
   self.width  = width;
   self.height = height;
   self.board  = malloc(width * height * sizeof(self.board[0]));
   assert(self.board != 0);
-  board_clear(&self);
+  clearBoard(&self);
   return self;
 }
 
-void board_clear(Board *self)
+void clearBoard(Board *self)
 {
-  memset(self->board, boardCell_empty,
+  memset(self->board, emptyBoardCell,
          self->width * self->height * sizeof(self->board[0]));
 }
 
-Board board_copy(Board *self)
+Board copyBoard(Board *self)
 {
-  Board res = board_create(self->width, self->height);
-  memcpy(res.board, self->board,
+  Board board = createBoard(self->width, self->height);
+  memcpy(board.board, self->board,
          self->width * self->height * sizeof(self->board[0]));
-  return(res);
+  return(board);
 }
 
-void board_destruct(Board *self)
+void destructBoard(Board *self)
 {
   free(self->board);
 }
 
-int board_coordInBoard(Board *self, BoardCoord coord)
+int coordInBoard(Board *self, BoardCoord coord)
 {
   return (   coord.row >= 0 && coord.row < self->height
           && coord.col >= 0 && coord.col < self->width);
 }
 
-BoardCell board_getCell(Board *self, BoardCoord coord)
+BoardCell getBoardCell(Board *self, BoardCoord coord)
 {
-  if(board_coordInBoard(self, coord))
+  if(coordInBoard(self, coord))
     return self->board[coord.row*self->width + coord.col];
-  return boardCell_invalid;
+  return invalidBoardCell;
 }
 
-void board_setCell(Board *self, BoardCoord coord, BoardCell cell)
+void setBoardCell(Board *self, BoardCoord coord, BoardCell cell)
 {
-  assert(board_coordInBoard(self, coord));
+  assert(coordInBoard(self, coord));
   self->board[coord.row * self->width + coord.col] = cell;
 }
 
-void board_print(Board *self)
+void printBoard(Board *self)
 {
-  BoardIterator iter = boardIterator_create(self);
+  BoardIterator iterator = createBoardIterator(self);
   int i;
   printf("   ");
   for(i = 0; i < self->width; i++) printf("%c ", 'A'+i);
   printf("\n");
-  for(;boardIterator_next(&iter);)
+  while(!boardIteratorFinished(&iterator))
   {
-    if (iter.coord.col == 0) printf("%2d ", iter.coord.row+1);
-    printf("%c ", board_signs[board_getCell(self, iter.coord)]);
-    if (iter.coord.col == self->width-1) printf("\n");
+    if (iterator.coord.col == 0) printf("%2d ", iterator.coord.row+1);
+    printf("%c ", boardSigns[getBoardCell(self, iterator.coord)]);
+    if (iterator.coord.col == self->width-1) printf("\n");
   }
 }
 
-int board_isThereEmptyCell(Board *self)
+int boardHasEmptyCell(Board *self)
 {
   int emptyCellCount = 0;
-  BoardIterator iter = boardIterator_create(self);
-  for(;boardIterator_next(&iter);) {
-    if (board_getCell(self, iter.coord) == boardCell_empty) {
+  BoardIterator iterator = createBoardIterator(self);
+  while(!boardIteratorFinished(&iterator)) {
+    if (getBoardCell(self, iterator.coord) == emptyBoardCell) {
       emptyCellCount++;
     }
   }
   return(emptyCellCount > 0);
 }
 
-void board_save(Board *self, FILE *file)
+void saveBoard(Board *self, FILE *file)
 {
   BoardSize width  = self->width;
   BoardSize height = self->height;
@@ -145,20 +145,20 @@ void board_save(Board *self, FILE *file)
   }
 }
 
-Board board_load(FILE *file)
+Board loadBoard(FILE *file)
 {
   BoardSize width, height;
   Board self;
   if (   (fread(&width,  sizeof(int), 1, file) == 1)
       && (fread(&height, sizeof(int), 1, file) == 1) )
   {
-    self = board_create(width, height);
+    self = createBoard(width, height);
     if (   fread(self.board, sizeof(self.board[0]), width*height, file)
         == width*height)
     {
       return(self);
     }
-    board_destruct(&self);
+    destructBoard(&self);
   }
   fprintf(stderr,"Can not load board file.");
   assert(0);
