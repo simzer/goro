@@ -19,7 +19,6 @@ const double miniMaxLoseScore = -INFINITY;
 
 MiniMax createMiniMax(Game *game) {
   MiniMax self;
-  self.monteCarloThreshold = 0.0;
   self.lookahead = 3;
   self.game = game;
   return self;
@@ -41,18 +40,16 @@ static double searchMaxScore(const MiniMax *self,
     BoardCoord maxScoredCoord;
     BoardIterator iterator = createBoardIterator(&game->board);
     for(;nextValidGameMove(game, &iterator);) {
-      if (self->monteCarloThreshold < ((double)rand()/RAND_MAX)) {
-        BoardCoord ignoredCoord;
-        Game nextGame = copyGame(game);
-        switchGamePlayer(&nextGame);
-        setBoardCell(&nextGame.board, iterator.coord, actualGamePlayerCell(game));
-        score = - searchMaxScore(self, &ignoredCoord, &nextGame, lookahead-1);
-        destructBoard(&nextGame.board);
-        if (score > maxScore) {
-          maxScore = score;
-          maxScoredCoord = iterator.coord;
+      BoardCoord ignoredCoord;
+      Game nextGame = copyGame(game);
+      switchGamePlayer(&nextGame);
+      setBoardCell(&nextGame.board, iterator.coord, actualGamePlayerCell(game));
+      score = - searchMaxScore(self, &ignoredCoord, &nextGame, lookahead-1);
+      destructBoard(&nextGame.board);
+      if (score > maxScore) {
+        maxScore = score;
+        maxScoredCoord = iterator.coord;
         }
-      }
     }
     *coord = maxScoredCoord;
     result = maxScore;
