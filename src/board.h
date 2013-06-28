@@ -17,6 +17,10 @@ typedef enum BoardCell {
   invalidBoardCell = 3
 } BoardCell;
 
+typedef struct BoardCoordString {
+  char chars[4];
+} BoardCoordString;
+
 typedef int BoardSize;
 
 typedef struct {
@@ -30,6 +34,8 @@ extern int boardCoordsEqual(BoardCoord *self, BoardCoord *reference);
 extern BoardCoord getBoardCoordNeighbour(BoardCoord *self,
                                          BoardDirection direction,
                                          BoardSize distance);
+extern BoardCoord stringToBoardCoord(BoardCoordString string);
+extern BoardCoordString boardCoordToString(BoardCoord coord);
 
 enum Direction {
   fullRoundDirectionBegin,

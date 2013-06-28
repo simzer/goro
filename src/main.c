@@ -34,13 +34,16 @@ int main(int argc, char *argv[])
          && game.vtable->movesPossible(&game)) )
   {
     BoardCoord coord;
-    Player *actualPlayer = players[game.actualPlayer];
+    BoardCoordString string;
+    Player *actualPlayer;
     switchGamePlayer(&game);
     printBoard(&game.board);
-    coord = actualPlayer->getMove(&actualPlayer);
+    actualPlayer = players[game.actualPlayer];
+    coord = actualPlayer->getMove(actualPlayer);
     setBoardCell(&game.board, coord, actualGamePlayerCell(&game));
-    printf("Player %d step: %c%d\n",
-           game.actualPlayer, 'a'+coord.col, 1+coord.row);
+    string = boardCoordToString(coord);
+    printf("Player %s step: %s\n",
+           gamePlayerNames[game.actualPlayer], string.chars);
   }
   printBoard(&game.board);
   printf(winner == noPlayer

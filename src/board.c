@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 
 #include "board.h"
 #include "boarditerator.h"
@@ -20,6 +21,10 @@ const BoardCoord directionCoords[directionNumber] = {
   {  0, -1 },            {  0, 1 },
   {  1, -1 }, {  1, 0 }, {  1, 1 }
 };
+
+static const char boardColumnCharacters[] = "ABCDEFGHJKLMNOPQRST";
+
+static BoardSize charToBoardColumn(char character);
 
 BoardCoord createBoardCoord(BoardSize row, BoardSize col) {
   BoardCoord self;
@@ -43,6 +48,41 @@ BoardCoord getBoardCoordNeighbour(BoardCoord *self,
   neighbour.col += distance * directionCoords[direction].col;
   neighbour.row += distance * directionCoords[direction].row;
   return(neighbour);
+}
+
+BoardCoord stringToBoardCoord(BoardCoordString string)
+{
+  BoardCoord coord;
+  char character;
+  int number;
+  int partsFound = sscanf(string.chars, "%c%d", &character, &number);
+  coord.col = charToBoardColumn(toupper(character));
+  coord.row = number-1;
+  if(partsFound != 2 || number == -1) {
+    return nullBoardCoord;
+  } else {
+    return coord;
+  }
+}
+
+BoardCoordString boardCoordToString(BoardCoord coord)
+{
+  BoardCoordString string;
+  int charsWritten =
+    snprintf(string.chars, sizeof(string.chars), "%c%d",
+             boardColumnCharacters[coord.col], coord.row+1);
+  assert(charsWritten < sizeof(string.chars));
+  string.chars[sizeof(string.chars)-1] = '\0';
+  return string;
+}
+
+static BoardSize charToBoardColumn(char character) {
+  BoardSize column = 0;
+  while(boardColumnCharacters[column] != character) {
+    if (column >= sizeof(boardColumnCharacters)) return -1;
+    column++;
+  }
+  return column;
 }
 
 int boardCoordsEqual(BoardCoord *self, BoardCoord *reference) {
@@ -105,7 +145,7 @@ void printBoard(Board *self)
   BoardIterator iterator = createBoardIterator(self);
   int i;
   printf("   ");
-  for(i = 0; i < self->width; i++) printf("%c ", 'A'+i);
+  for(i = 0; i < self->width; i++) printf("%c ", boardColumnCharacters[i]);
   printf("\n");
   while(!boardIteratorFinished(&iterator))
   {

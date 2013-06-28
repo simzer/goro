@@ -18,13 +18,13 @@ CLIPlayer createCLIPlayer(Game *game)
 static BoardCoord getCLIPlayerMove(CLIPlayer *self)
 {
   BoardCoord coord;
-  char colChar;
+  BoardCoordString string;
   int  rowIndex;
   Game* game = ((Player *)self)->game;
   printf("Player %d step: ", game->actualPlayer);
   do {
-    scanf ("%c%d", &colChar, &rowIndex);
-    coord = createBoardCoord(rowIndex - 1, colChar - 'a');
+    scanf("%3s", string.chars);
+    coord = stringToBoardCoord(string);
   } while (!game->vtable->validMove(game, coord));
   return(coord);
 }

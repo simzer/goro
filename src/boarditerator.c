@@ -34,5 +34,5 @@ int boardIteratorFinished(BoardIterator *self)
       self->run = 0;
     }
   }
-  return(self->run);
+  return(!self->run);
 }
