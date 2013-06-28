@@ -5,11 +5,22 @@
 
 #include  "ui.h"
 
-BoardCoord getUIMove(Game *game)
+static BoardCoord getCLIPlayerMove(CLIPlayer *self);
+
+CLIPlayer createCLIPlayer(Game *game)
+{
+  CLIPlayer self;
+  self.player.game = game;
+  self.player.getMove = &getCLIPlayerMove;
+  return self;
+}
+
+static BoardCoord getCLIPlayerMove(CLIPlayer *self)
 {
   BoardCoord coord;
   char colChar;
   int  rowIndex;
+  Game* game = ((Player *)self)->game;
   printf("Player %d step: ", game->actualPlayer);
   do {
     scanf ("%c%d", &colChar, &rowIndex);

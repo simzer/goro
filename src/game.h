@@ -14,19 +14,19 @@ typedef enum {
   firstPlayer = 0,
   secondPlayer = 1,
   numberOfPlayers = 2
-} Player;
+} PlayerId;
 
 typedef struct Game Game;
 
 typedef struct GameVirtualTable {
   int (*validMove)(Game *self, BoardCoord coord);
   int (*movesPossible)(Game *self);
-  Player (*winner)(Game *self);
+  PlayerId (*winner)(Game *self);
   double (*evalPosition)(Game *self);
 } GameVirtualTable;
 
 struct Game {
-  Player actualPlayer;
+  PlayerId actualPlayer;
   Board board;
   const GameVirtualTable *vtable;
 };

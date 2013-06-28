@@ -11,7 +11,7 @@
 
 static int validTicTacToeMove(Game *self, BoardCoord coord);
 static int possibleTicTacToeMoves(Game *self);
-static Player ticTacToeWinner(Game *self);
+static PlayerId ticTacToeWinner(Game *self);
 static double evalTicTacToePosition(Game *self);
 
 static const GameVirtualTable ticTacToeVirtualTable = {
@@ -38,11 +38,11 @@ static int possibleTicTacToeMoves(Game *self)
   return boardHasEmptyCell(&self->board);
 }
 
-static Player ticTacToeWinner(Game *self)
+static PlayerId ticTacToeWinner(Game *self)
 {
   BoardSize size = self->board.width;
   BoardSize i, j;
-  Player player;
+  PlayerId player;
   BoardCoord coord;
   for(player = firstPlayer; player < numberOfPlayers; player++) {
     int fullLeftDiagonal = 1;
@@ -72,7 +72,7 @@ static Player ticTacToeWinner(Game *self)
 
 static double evalTicTacToePosition(Game *self)
 {
-  Player winner = self->vtable->winner(self);
+  PlayerId winner = self->vtable->winner(self);
   return (winner == self->actualPlayer ? miniMaxWinScore :
           winner == noPlayer     ? 0 :
                                       miniMaxLoseScore );

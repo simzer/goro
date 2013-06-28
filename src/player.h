@@ -3,15 +3,17 @@
 
    Copyright (C) 2013 Goro Team <https://github.com/goro-dev?tab=members> */
 
-#ifndef __UI_H__
-#define __UI_H__
+#ifndef __PLAYER_H__
+#define __PLAYER_H__
 
-#include "player.h"
+#include "game.h"
+#include "board.h"
 
-typedef struct CLIPlayer {
-  Player player;
-} CLIPlayer;
+typedef struct Player Player;
 
-extern CLIPlayer createCLIPlayer(Game *game);
+struct Player {
+  Game *game;
+  BoardCoord (*getMove)(Player *self);
+};
 
 #endif

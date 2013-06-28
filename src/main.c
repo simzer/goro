@@ -17,24 +17,27 @@
 int main(int argc, char *argv[])
 {
   Game game;
-  MiniMax miniMax = createMiniMax(&game);
-  Player winner;
+  MiniMax computer = createMiniMax(&game);
+  CLIPlayer human = createCLIPlayer(&game);
+  Player *players[2] = { &human, &computer };
+  PlayerId winner;
+
   if ((argc > 1) && (strcmp(argv[1], "--tictactoe") == 0)) {
     game = createTicTacToe(3);
-    miniMax.lookahead = 9;
+    computer.lookahead = 9;
   } else {
     game = createGomoko(createBoard(9,9));
   }
+
   while(winner = game.vtable->winner(&game),
         (   winner == noPlayer
          && game.vtable->movesPossible(&game)) )
   {
     BoardCoord coord;
+    Player *actualPlayer = players[game.actualPlayer];
     switchGamePlayer(&game);
     printBoard(&game.board);
-    coord = (game.actualPlayer == firstPlayer)
-            ? getUIMove(&game)
-            : getMiniMaxMove(&miniMax);
+    coord = actualPlayer->getMove(&actualPlayer);
     setBoardCell(&game.board, coord, actualGamePlayerCell(&game));
     printf("Player %d step: %c%d\n",
            game.actualPlayer, 'a'+coord.col, 1+coord.row);

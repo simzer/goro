@@ -11,7 +11,7 @@
 
 static int validGoMove(Game *self, BoardCoord coord);
 static int possibleGoMoves(Game *self);
-static Player goWinner(Game *self);
+static PlayerId goWinner(Game *self);
 static double evalGoPosition(Game *self);
 
 static const GameVirtualTable goVirtualtable = {
@@ -48,7 +48,7 @@ static int possibleGoMoves(Game *self)
   // to be implemented
 }
 
-static Player goWinner(Game *self)
+static PlayerId goWinner(Game *self)
 {
   // to be implemented
 }

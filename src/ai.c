@@ -9,6 +9,8 @@
 #include "boarditerator.h"
 #include "ai.h"
 
+static BoardCoord getMiniMaxMove(MiniMax *self);
+
 static double searchMaxScore(const MiniMax *self,
                             BoardCoord *coord,
                             Game *game,
@@ -19,8 +21,9 @@ const double miniMaxLoseScore = -INFINITY;
 
 MiniMax createMiniMax(Game *game) {
   MiniMax self;
+  self.player.getMove = &getMiniMaxMove;
+  self.player.game = game;
   self.lookahead = 3;
-  self.game = game;
   return self;
 }
 
@@ -30,7 +33,7 @@ static double searchMaxScore(const MiniMax *self,
                             int lookahead)
 {
   double result;
-  Player winner = game->vtable->winner(game);
+  PlayerId winner = game->vtable->winner(game);
   if (   game->vtable->movesPossible(game)
       && (winner == noPlayer)
       && (lookahead > 0))
@@ -59,9 +62,9 @@ static double searchMaxScore(const MiniMax *self,
   return result;
 }
 
-BoardCoord getMiniMaxMove(MiniMax *self)
+static BoardCoord getMiniMaxMove(MiniMax *self)
 {
   BoardCoord coord;
-  searchMaxScore(self, &coord, self->game, self->lookahead);
+  searchMaxScore(self, &coord, ((Player *)self)->game, self->lookahead);
   return(coord);
 }

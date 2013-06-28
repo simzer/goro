@@ -10,7 +10,7 @@
 
 static int validGomokoMove(Game *self, BoardCoord coord);
 static int possibleGomokoMoves(Game *self);
-static Player gomokoWinner(Game *self);
+static PlayerId gomokoWinner(Game *self);
 static double evalGomokoPosition(Game *self);
 
 static const BoardSize gomokoWinnerRowSize = 5;
@@ -39,9 +39,9 @@ static int possibleGomokoMoves(Game *self)
   return boardHasEmptyCell(&self->board);
 }
 
-static Player gomokoWinner(Game *self)
+static PlayerId gomokoWinner(Game *self)
 {
-  Player player;
+  PlayerId player;
   for(player = firstPlayer; player < numberOfPlayers; player++) {
     BoardIterator iterator = createBoardIterator(&self->board);
     while(!boardIteratorFinished(&iterator)) {
