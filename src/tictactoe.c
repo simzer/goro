@@ -5,7 +5,7 @@
 
 #include <math.h>
 
-#include "ai.h"
+#include "minimax.h"
 #include "game.h"
 #include "boarditerator.h"
 

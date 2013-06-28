@@ -11,8 +11,8 @@
 #include "game.h"
 #include "tictactoe.h"
 #include "gomoko.h"
-#include "ui.h"
-#include "ai.h"
+#include "cliplayer.h"
+#include "minimax.h"
 
 int main(int argc, char *argv[])
 {

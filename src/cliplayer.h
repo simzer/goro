@@ -3,8 +3,8 @@
 
    Copyright (C) 2013 Goro Team <https://github.com/goro-dev?tab=members> */
 
-#ifndef __UI_H__
-#define __UI_H__
+#ifndef __CLIPLAYER_H__
+#define __CLIPLAYER_H__
 
 #include "player.h"
 

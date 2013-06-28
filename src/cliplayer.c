@@ -3,7 +3,7 @@
 
    Copyright (C) 2013 Goro Team <https://github.com/goro-dev?tab=members> */
 
-#include  "ui.h"
+#include  "cliplayer.h"
 
 static BoardCoord getCLIPlayerMove(CLIPlayer *self);
 

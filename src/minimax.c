@@ -7,7 +7,7 @@
 #include <math.h>
 
 #include "boarditerator.h"
-#include "ai.h"
+#include "minimax.h"
 
 static BoardCoord getMiniMaxMove(MiniMax *self);
 
