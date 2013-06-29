@@ -10,11 +10,13 @@
 #include "minimax.h"
 #include "boarditerator.h"
 
-
+static double calculateScore(Gomoko *self,
+                             int friendCounters[], int enemyCounters[]);
 static void countRowsInAllDirection(Gomoko *self, BoardCoord coord,
                                     int friendCounters[], int enemyCounters[]);
-static void countRow(Gomoko *self, BoardCoord coord, Direction direction,
+static void countRow(Gomoko *self, BoardLineIterator *iterator,
                      int *friends, int *enemies);
+
 static int gomokoMoveWorthChecking(Gomoko *self, BoardCoord coord);
 static int validGomokoMove(Gomoko *self, BoardCoord coord);
 static int gomokoGameOver(Gomoko *self);
@@ -43,7 +45,8 @@ Gomoko createGomoko(Board board)
 
 static int gomokoMoveWorthChecking(Gomoko *self, BoardCoord coord)
 {
-  return boardCellHasNeighbour(&((Game *)self)->board, coord);
+  return boardCellHasNeighbour(&((Game *)self)->board, coord,
+                               eightNeighbourhood);
 }
 
 static int validGomokoMove(Gomoko *self, BoardCoord coord)
@@ -92,7 +95,6 @@ static double evalGomokoPosition(Gomoko *self)
   } else if (winner != noPlayer) {
     return miniMaxLoseScore;
   } else {
-    double score;
     BoardIterator iterator = createBoardIterator(&(((Game *)self)->board));
     int friendCounters[self->winnerRowSize];
     int enemyCounters[self->winnerRowSize];
@@ -104,47 +106,55 @@ static double evalGomokoPosition(Gomoko *self)
       countRowsInAllDirection(self, iterator.coord,
                               friendCounters, enemyCounters);
     }
-    double weight = 1;
-    int distance;
-    for(distance = 1; distance < self->winnerRowSize; distance++) {
-      score -= enemyCounters[distance] * weight;
-      weight *= ((Game *)self)->board.height * ((Game *)self)->board.width;
-      score += friendCounters[distance] * weight;
-      weight *= ((Game *)self)->board.height * ((Game *)self)->board.width;
-    }
-    return score;
+    return calculateScore(self, friendCounters, enemyCounters);
   }
+}
+
+static double calculateScore(Gomoko *self,
+                             int friendCounters[], int enemyCounters[])
+{
+  double score;
+  double weight = 1;
+  int distance;
+  for(distance = 0; distance < self->winnerRowSize; distance++) {
+    score -= enemyCounters[distance] * weight;
+    weight *= ((Game *)self)->board.height * ((Game *)self)->board.width;
+    score += friendCounters[distance] * weight;
+    weight *= ((Game *)self)->board.height * ((Game *)self)->board.width;
+  }
+  return score;
 }
 
 static void countRowsInAllDirection(Gomoko *self, BoardCoord coord,
                                     int friendCounters[], int enemyCounters[])
 {
-  Direction direction;
-  for(direction =  halfRoundDirectionBegin;
-      direction <= roundDirectionEnd;
-      direction++)
+  NeighbourIterator iterator =
+    createNeighbourIterator(coord, eightNeighbourhood);
+
+  while(getNeighbours(&iterator))
   {
     int friends = 0;
     int enemies = 0;
-    countRow(self, coord, direction, &friends, &enemies);
+    BoardLineIterator lineIterator =
+      createBoardLineIterator(coord, getNeighbourDirection(&iterator),
+                              self->winnerRowSize);
+
+    countRow(self, &lineIterator, &friends, &enemies);
     if ((enemies == 0) && (friends > 0)) {
-      friendCounters[friends]++;
+      friendCounters[friends-1]++;
     }
     if ((friends == 0) && (enemies > 0)) {
-      enemyCounters[enemies]++;
+      enemyCounters[enemies-1]++;
     }
   }
 }
 
-static void countRow(Gomoko *self, BoardCoord coord, Direction direction,
+static void countRow(Gomoko *self, BoardLineIterator *iterator,
                      int *friends, int *enemies)
 {
-  int distance;
-  for (distance = 0; distance < self->winnerRowSize; distance++)
+  while(getBoardLineCoords(iterator))
   {
-    BoardCoord neighbour =
-      getBoardCoordNeighbour(&coord, direction, distance);
-    BoardCell cell = getBoardCell(&((Game *)self)->board, neighbour);
+    BoardCell cell = getBoardCell(&((Game *)self)->board, iterator->coord);
     if (cell == gamePlayerCells[((Game *)self)->actualPlayer]) {
       (*friends)++;
     } else if (   cell != emptyBoardCell

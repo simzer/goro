@@ -7,6 +7,7 @@
 #include <assert.h>
 
 #include "board.h"
+#include "boarditerator.h"
 #include "group.h"
 
 int groupLiberties(Group *self)
@@ -14,11 +15,11 @@ int groupLiberties(Group *self)
   Board board = copyBoard(self->board);
   int i;
   for (i = 0; i < self->size; i++) {
-    Direction direction; // todo: go direction instead
-    for (direction = northDirection;
-         direction <= southDirection;
-         direction += 2)
-    setBoardCell(self->board, self->cells[i], emptyBoardCell);
+    NeighbourIterator iterator =
+        createNeighbourIterator(nullBoardCoord,fourNeighbourhood);
+    while(getNeighbours(&iterator)) {
+      setBoardCell(self->board, self->cells[i], emptyBoardCell);
+    }
   }
 
   destructBoard(&board);

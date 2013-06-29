@@ -30,7 +30,6 @@ int main(int argc, char *argv[])
     game = &tictactoe;
   } else {
     gomoko = createGomoko(createBoard(19,19));
-    gomoko.winnerRowSize = 5;
     game = &gomoko;
   }
   computer = createMiniMax(game);

@@ -8,7 +8,7 @@
 
 #include "stdio.h"
 
-typedef enum Direction Direction;
+#include "boardcoord.h"
 
 typedef enum BoardCell {
   emptyBoardCell = 0,
@@ -16,42 +16,6 @@ typedef enum BoardCell {
   whiteBoardCell = 2,
   invalidBoardCell = 3
 } BoardCell;
-
-typedef struct BoardCoordString {
-  char chars[4];
-} BoardCoordString;
-
-typedef int BoardSize;
-
-typedef struct {
-  BoardSize row;
-  BoardSize col;
-} BoardCoord;
-extern const BoardCoord nullBoardCoord;
-extern BoardCoord createBoardCoord(BoardSize row, BoardSize col);
-extern BoardCoord addBoardCoords(BoardCoord *self, BoardCoord *add);
-extern int boardCoordsEqual(BoardCoord *self, BoardCoord *reference);
-extern BoardCoord getBoardCoordNeighbour(BoardCoord *self,
-                                         Direction direction,
-                                         BoardSize distance);
-extern BoardCoord stringToBoardCoord(BoardCoordString string);
-extern BoardCoordString boardCoordToString(BoardCoord coord);
-
-enum Direction {
-  fullRoundDirectionBegin,
-  northWestDirection = 0,
-  northDirection     = 1,
-  northEastDirection = 2,
-  westDirection      = 3,
-  halfRoundDirectionBegin,
-  eastDirection      = 4,
-  southWestDirection = 5,
-  southDirection     = 6,
-  southEastDirection,
-  roundDirectionEnd  = 7,
-  directionNumber    = 8
-};
-extern const BoardCoord directionCoords[directionNumber];
 
 typedef struct {
   BoardSize width;
@@ -71,6 +35,7 @@ extern int coordInBoard(Board *self, BoardCoord coord);
 extern void printBoard(Board *self);
 extern void saveBoard(Board *self, FILE *file);
 extern int boardHasEmptyCell(Board *self);
-extern int boardCellHasNeighbour(Board *self, BoardCoord coord);
+extern int boardCellHasNeighbour(Board *self, BoardCoord coord,
+                                 Neighbourhood neighbourhood);
 
 #endif

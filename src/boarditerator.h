@@ -10,7 +10,33 @@
 
 typedef struct
 {
-  int run;
+  int index;
+  BoardCoord center;
+  BoardCoord neighbour;
+  Neighbourhood neighbourhood;
+} NeighbourIterator;
+
+extern NeighbourIterator createNeighbourIterator(BoardCoord coord,
+                                                 Neighbourhood neighbourhood);
+extern int getNeighbours(NeighbourIterator *self);
+extern BoardCoord getNeighbourDirection(NeighbourIterator *self);
+
+
+typedef struct
+{
+  BoardSize index;
+  BoardSize size;
+  BoardCoord coord;
+  BoardCoord startCoord;
+  BoardCoord direction;
+} BoardLineIterator;
+extern BoardLineIterator createBoardLineIterator(BoardCoord startCoord,
+                                                 BoardCoord direction,
+                                                 BoardSize size);
+extern int getBoardLineCoords(BoardLineIterator *self);
+
+typedef struct
+{
   BoardCoord coord;
   Board *board;
 } BoardIterator;

@@ -10,85 +10,10 @@
 #include <ctype.h>
 
 #include "board.h"
+#include "boardcoord.h"
 #include "boarditerator.h"
 
-const BoardCoord nullBoardCoord = { 0, 0 };
-
 const char boardSigns[] = { '.', '@', 'O'};
-
-const BoardCoord directionCoords[directionNumber] = {
-  { -1, -1 }, { -1, 0 }, { -1, 1 },
-  {  0, -1 },            {  0, 1 },
-  {  1, -1 }, {  1, 0 }, {  1, 1 }
-};
-
-static const char boardColumnCharacters[] = "ABCDEFGHJKLMNOPQRST";
-
-static BoardSize charToBoardColumn(char character);
-
-BoardCoord createBoardCoord(BoardSize row, BoardSize col) {
-  BoardCoord self;
-  self.row = row;
-  self.col = col;
-  return self;
-}
-
-BoardCoord addBoardCoords(BoardCoord *self, BoardCoord *add) {
-  BoardCoord coord = *self;
-  coord.row += add->row;
-  coord.col += add->col;
-  return coord;
-}
-
-BoardCoord getBoardCoordNeighbour(BoardCoord *self,
-                                  Direction direction,
-                                  BoardSize distance)
-{
-  BoardCoord neighbour = *self;
-  neighbour.col += distance * directionCoords[direction].col;
-  neighbour.row += distance * directionCoords[direction].row;
-  return(neighbour);
-}
-
-BoardCoord stringToBoardCoord(BoardCoordString string)
-{
-  BoardCoord coord;
-  char character;
-  int number;
-  int partsFound = sscanf(string.chars, "%c%d", &character, &number);
-  coord.col = charToBoardColumn(toupper(character));
-  coord.row = number-1;
-  if(partsFound != 2 || number == -1) {
-    return nullBoardCoord;
-  } else {
-    return coord;
-  }
-}
-
-BoardCoordString boardCoordToString(BoardCoord coord)
-{
-  BoardCoordString string;
-  int charsWritten =
-    snprintf(string.chars, sizeof(string.chars), "%c%d",
-             boardColumnCharacters[coord.col], coord.row+1);
-  assert(charsWritten < sizeof(string.chars));
-  string.chars[sizeof(string.chars)-1] = '\0';
-  return string;
-}
-
-static BoardSize charToBoardColumn(char character) {
-  BoardSize column = 0;
-  while(boardColumnCharacters[column] != character) {
-    if (column >= sizeof(boardColumnCharacters)) return -1;
-    column++;
-  }
-  return column;
-}
-
-int boardCoordsEqual(BoardCoord *self, BoardCoord *reference) {
-  return    (self->row == reference->row)
-         && (self->col == reference->col);
-}
 
 Board createBoard(BoardSize width,
                   BoardSize height)
@@ -128,16 +53,15 @@ int coordInBoard(Board *self, BoardCoord coord)
           && coord.col >= 0 && coord.col < self->width);
 }
 
-int boardCellHasNeighbour(Board *self, BoardCoord coord)
+int boardCellHasNeighbour(Board *self, BoardCoord coord,
+                          Neighbourhood neighbourhood)
 {
-  Direction direction;
   int hasNeighbour = 0;
-  for(direction = fullRoundDirectionBegin;
-      direction < roundDirectionEnd;
-      direction++)
+  NeighbourIterator iterator =
+      createNeighbourIterator(coord, neighbourhood);
+  while(getNeighbours(&iterator))
   {
-    BoardCell neighbour = getBoardCell(self,
-                              getBoardCoordNeighbour(&coord, direction, 1));
+    BoardCell neighbour = getBoardCell(self, iterator.neighbour);
     hasNeighbour |= (neighbour != invalidBoardCell)
                     && (neighbour != emptyBoardCell);
   }
@@ -162,7 +86,7 @@ void printBoard(Board *self)
   BoardIterator iterator = createBoardIterator(self);
   int i;
   printf("   ");
-  for(i = 0; i < self->width; i++) printf("%c ", boardColumnCharacters[i]);
+  for(i = 0; i < self->width; i++) printf("%c ", boardColumnToChar(i));
   printf("\n");
   while(!boardIteratorFinished(&iterator))
   {
