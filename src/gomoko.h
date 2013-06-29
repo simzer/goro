@@ -8,6 +8,11 @@
 
 #include "game.h"
 
-extern Game createGomoko(Board board);
+typedef struct Gomoko {
+  Game game;
+  int winnerRowSize;
+} Gomoko;
+
+extern Gomoko createGomoko(Board board);
 
 #endif

@@ -16,9 +16,11 @@ static double evalTicTacToePosition(Game *self);
 
 static const GameVirtualTable ticTacToeVirtualTable = {
   &validTicTacToeMove,
+  0,
   &ticTacToeGameOver,
   &ticTacToeWinner,
-  &evalTicTacToePosition
+  &evalTicTacToePosition,
+  &copyGame
 };
 
 Game createTicTacToe(BoardSize size)

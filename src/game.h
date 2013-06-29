@@ -20,9 +20,11 @@ typedef struct Game Game;
 
 typedef struct GameVirtualTable {
   int (*validMove)(Game *self, BoardCoord coord);
+  int (*moveWorthChecking)(Game *self, BoardCoord coord);
   int (*over)(Game *self);
   PlayerId (*winner)(Game *self);
   double (*evalPosition)(Game *self);
+  Game *(*copy)(Game *self);
 } GameVirtualTable;
 
 struct Game {
@@ -34,9 +36,11 @@ struct Game {
 extern const BoardCell gamePlayerCells[numberOfPlayers];
 extern const char *gamePlayerNames[numberOfPlayers];
 extern Game createGame(Board board);
-extern Game copyGame(Game *self);
+extern Game *copyGame(Game *self);
+extern void destructGame(Game *self);
 extern void gameMove(Game *self, BoardCoord coord);
 extern BoardCell actualGamePlayerCell(Game *self);
 extern int nextValidGameMove(Game *self, BoardIterator *iterator);
+extern int nextMoveWorthChecking(Game *self, BoardIterator *iterator);
 
 #endif

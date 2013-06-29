@@ -8,7 +8,7 @@
 
 #include "stdio.h"
 
-typedef enum Direction BoardDirection;
+typedef enum Direction Direction;
 
 typedef enum BoardCell {
   emptyBoardCell = 0,
@@ -32,7 +32,7 @@ extern BoardCoord createBoardCoord(BoardSize row, BoardSize col);
 extern BoardCoord addBoardCoords(BoardCoord *self, BoardCoord *add);
 extern int boardCoordsEqual(BoardCoord *self, BoardCoord *reference);
 extern BoardCoord getBoardCoordNeighbour(BoardCoord *self,
-                                         BoardDirection direction,
+                                         Direction direction,
                                          BoardSize distance);
 extern BoardCoord stringToBoardCoord(BoardCoordString string);
 extern BoardCoordString boardCoordToString(BoardCoord coord);
@@ -70,5 +70,6 @@ extern int coordInBoard(Board *self, BoardCoord coord);
 extern void printBoard(Board *self);
 extern void saveBoard(Board *self, FILE *file);
 extern int boardHasEmptyCell(Board *self);
+extern int boardCellHasNeighbour(Board *self, BoardCoord coord);
 
 #endif

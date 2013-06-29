@@ -41,7 +41,7 @@ BoardCoord addBoardCoords(BoardCoord *self, BoardCoord *add) {
 }
 
 BoardCoord getBoardCoordNeighbour(BoardCoord *self,
-                                  BoardDirection direction,
+                                  Direction direction,
                                   BoardSize distance)
 {
   BoardCoord neighbour = *self;
@@ -119,12 +119,29 @@ Board copyBoard(Board *self)
 void destructBoard(Board *self)
 {
   free(self->board);
+  self->board = 0;
 }
 
 int coordInBoard(Board *self, BoardCoord coord)
 {
   return (   coord.row >= 0 && coord.row < self->height
           && coord.col >= 0 && coord.col < self->width);
+}
+
+int boardCellHasNeighbour(Board *self, BoardCoord coord)
+{
+  Direction direction;
+  int hasNeighbour = 0;
+  for(direction = fullRoundDirectionBegin;
+      direction < roundDirectionEnd;
+      direction++)
+  {
+    BoardCell neighbour = getBoardCell(self,
+                              getBoardCoordNeighbour(&coord, direction, 1));
+    hasNeighbour |= (neighbour != invalidBoardCell)
+                    && (neighbour != emptyBoardCell);
+  }
+  return hasNeighbour;
 }
 
 BoardCell getBoardCell(Board *self, BoardCoord coord)

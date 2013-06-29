@@ -23,7 +23,7 @@ MiniMax createMiniMax(Game *game) {
   MiniMax self;
   self.player.getMove = &getMiniMaxMove;
   self.player.game = game;
-  self.lookahead = 3;
+  self.lookahead = 5;
   return self;
 }
 
@@ -38,15 +38,15 @@ static double searchMaxScore(const MiniMax *self,
   {
     double score;
     double maxScore = -INFINITY;
-    BoardCoord maxScoredCoord;
+    BoardCoord maxScoredCoord = *coord;
     BoardIterator iterator = createBoardIterator(&game->board);
-    while(nextValidGameMove(game, &iterator)) {
+    while(nextMoveWorthChecking(game, &iterator)) {
       BoardCoord ignoredCoord;
-      Game nextGame = copyGame(game);
-      gameMove(&nextGame, iterator.coord);
-      score = - searchMaxScore(self, &ignoredCoord, &nextGame, lookahead-1);
-      destructBoard(&nextGame.board);
-      if (score > maxScore) {
+      Game *nextGame = game->vtable->copy(game);
+      gameMove(nextGame, iterator.coord);
+      score = - searchMaxScore(self, &ignoredCoord, nextGame, lookahead-1);
+      destructGame(nextGame);
+      if (score >= maxScore) {
         maxScore = score;
         maxScoredCoord = iterator.coord;
       }
@@ -61,7 +61,10 @@ static double searchMaxScore(const MiniMax *self,
 
 static BoardCoord getMiniMaxMove(MiniMax *self)
 {
+  BoardIterator iterator = createBoardIterator(&(((Player *)self)->game->board));
   BoardCoord coord;
+  nextValidGameMove(((Player *)self)->game, &iterator);
+  coord = iterator.coord;
   searchMaxScore(self, &coord, ((Player *)self)->game, self->lookahead);
   return(coord);
 }

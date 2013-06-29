@@ -9,16 +9,20 @@
 #include "go.h"
 #include "boarditerator.h"
 
+static int goMoveWorthChecking(Game *self, BoardCoord coord);
 static int validGoMove(Game *self, BoardCoord coord);
 static int goGameOver(Game *self);
 static PlayerId goWinner(Game *self);
 static double evalGoPosition(Game *self);
+static Game *copyGoGame(Game *self);
 
 static const GameVirtualTable goVirtualtable = {
   &validGoMove,
+  &goMoveWorthChecking,
   &goGameOver,
   &goWinner,
-  &evalGoPosition
+  &evalGoPosition,
+  &copyGoGame
 };
 
 /*
@@ -33,6 +37,11 @@ Game createGo(Board board)
   // to be implemented
 }
 
+static Game *copyGoGame(Game *self)
+{
+  return copyGame(self);
+}
+
 static int validGoMove(Game *self, BoardCoord coord)
 {
   // to be implemented
@@ -41,6 +50,11 @@ static int validGoMove(Game *self, BoardCoord coord)
     move not dies instantly
     not results the same position as the one before previous
   */
+}
+
+static int goMoveWorthChecking(Game *self, BoardCoord coord)
+{
+  // to be implemented
 }
 
 static int goGameOver(Game *self)

@@ -3,6 +3,9 @@
 
    Copyright (C) 2013 Goro Team <https://github.com/goro-dev?tab=members> */
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "game.h"
 
 static void switchGamePlayer(Game *self);
@@ -30,11 +33,18 @@ Game createGame(Board board)
   return self;
 }
 
-Game copyGame(Game *self)
+Game *copyGame(Game *self)
 {
-  Game game = *self;
-  game.board = copyBoard(&(self->board));
-  return(game);
+  Game *copy = (Game *)malloc(sizeof(Game));
+  *copy = *self;
+  copy->board = copyBoard(&(self->board));
+  return copy;
+}
+
+void destructGame(Game *self)
+{
+  destructBoard(&(self->board));
+  free(self);
 }
 
 void gameMove(Game *self, BoardCoord coord)
@@ -57,5 +67,16 @@ int nextValidGameMove(Game *self, BoardIterator *iterator)
     result = !boardIteratorFinished(iterator);
   } while(   (result == 1)
           && !self->vtable->validMove(self, iterator->coord));
+  return result;
+}
+
+int nextMoveWorthChecking(Game *self, BoardIterator *iterator)
+{
+  int result;
+  do {
+    result = nextValidGameMove(self,iterator);
+  } while(   (result == 1)
+          && (self->vtable->moveWorthChecking != 0)
+          && !self->vtable->moveWorthChecking(self, iterator->coord));
   return result;
 }

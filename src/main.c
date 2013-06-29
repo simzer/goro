@@ -18,26 +18,33 @@ static void printWinnerPosition(Game *game);
 
 int main(int argc, char *argv[])
 {
-  Game game;
-  MiniMax computer = createMiniMax(&game);
-  CLIPlayer human = createCLIPlayer(&game);
+  Game *game;
+  Gomoko gomoko;
+  Game tictactoe;
+  MiniMax computer;
+  CLIPlayer human;
   Player *players[2] = { &human, &computer };
 
   if ((argc > 1) && (strcmp(argv[1], "--tictactoe") == 0)) {
-    game = createTicTacToe(3);
-    computer.lookahead = 9;
+    tictactoe = createTicTacToe(3);
+    game = &tictactoe;
   } else {
-    game = createGomoko(createBoard(9,9));
+    gomoko = createGomoko(createBoard(9,9));
+    gomoko.winnerRowSize = 5;
+    game = &gomoko;
   }
+  computer = createMiniMax(game);
+  computer.lookahead = 4;
+  human = createCLIPlayer(game);
 
-  while(!game.vtable->over(&game))
+  while(!game->vtable->over(game))
   {
     BoardCoord coord;
     BoardCoordString string;
-    coord = players[game.actualPlayer]->getMove(players[game.actualPlayer]);
-    gameMove(&game, coord);
+    coord = players[game->actualPlayer]->getMove(players[game->actualPlayer]);
+    gameMove(game, coord);
   }
-  printWinnerPosition(&game);
+  printWinnerPosition(game);
   return 0;
 }
 
