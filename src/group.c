@@ -3,6 +3,9 @@
 
    Copyright (C) 2013 Goro Team <https://github.com/goro-dev?tab=members> */
 
+#include <stdlib.h>
+#include <assert.h>
+
 #include "board.h"
 #include "group.h"
 
@@ -37,9 +40,10 @@ void removeGroup(Group *self)
 
 GroupIterator createGroupIterator(Board *board)
 {
+  GroupIterator iterator;
   // todo implement
   assert(0);
-  return 0;
+  return iterator;
 }
 
 int groupIteratorFinished(GroupIterator *self)

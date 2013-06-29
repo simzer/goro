@@ -11,7 +11,8 @@
 #include "boarditerator.h"
 
 
-
+static void countRowsInAllDirection(Gomoko *self, BoardCoord coord,
+                                    int friendCounters[], int enemyCounters[]);
 static void countRow(Gomoko *self, BoardCoord coord, Direction direction,
                      int *friends, int *enemies);
 static int gomokoMoveWorthChecking(Gomoko *self, BoardCoord coord);
@@ -67,29 +68,19 @@ static Gomoko *copyGomokoGame(Gomoko *self)
 static PlayerId gomokoWinner(Gomoko *self)
 {
   PlayerId player;
-  for(player = firstPlayer; player < numberOfPlayers; player++) {
-    BoardIterator iterator = createBoardIterator(&((Game *)self)->board);
-    while(!boardIteratorFinished(&iterator)) {
-      Direction direction;
-      for(direction =  halfRoundDirectionBegin;
-          direction <= roundDirectionEnd;
-          direction++)
-      {
-        BoardSize distance;
-        int winnerAmountInARow = 1;
-        for(distance = 0;
-            distance < self->winnerRowSize;
-            distance++)
-        {
-          BoardCoord neighbour =
-            getBoardCoordNeighbour(&iterator.coord, direction, distance);
-          winnerAmountInARow &=
-            getBoardCell(&(((Game *)self)->board), neighbour) == gamePlayerCells[player];
-        }
-        if (winnerAmountInARow) return(player);
-      }
-    }
+  BoardIterator iterator = createBoardIterator(&((Game *)self)->board);
+  int friendCounters[self->winnerRowSize];
+  int enemyCounters[self->winnerRowSize];
+  memset(friendCounters, 0, self->winnerRowSize * sizeof(int));
+  memset(enemyCounters, 0, self->winnerRowSize * sizeof(int));
+  while(!boardIteratorFinished(&iterator)) {
+    countRowsInAllDirection(self, iterator.coord,
+                            friendCounters, enemyCounters);
   }
+  if(friendCounters[self->winnerRowSize-1] > 0)
+    return actualGamePlayer(self);
+  if(enemyCounters[self->winnerRowSize-1] > 0)
+    return otherGamePlayer(self);
   return(noPlayer);
 }
 
@@ -101,41 +92,47 @@ static double evalGomokoPosition(Gomoko *self)
   } else if (winner != noPlayer) {
     return miniMaxLoseScore;
   } else {
-//    return(0);
-    enum { friend = 0, enemy = 1 };
     double score;
-    int counters[self->winnerRowSize][2];
-    int side;
     BoardIterator iterator = createBoardIterator(&(((Game *)self)->board));
-    memset(counters, 0, self->winnerRowSize * 2 * sizeof(counters[0]));
+    int friendCounters[self->winnerRowSize];
+    int enemyCounters[self->winnerRowSize];
+    memset(friendCounters, 0, self->winnerRowSize * sizeof(int));
+    memset(enemyCounters, 0, self->winnerRowSize * sizeof(int));
     // Count connected sections (xx, xxx, xxxx, xxxxx)
     while(!boardIteratorFinished(&iterator))
     {
-      Direction direction;
-      for(direction =  halfRoundDirectionBegin;
-          direction <= roundDirectionEnd;
-          direction++)
-      {
-        int friends = 0;
-        int enemies = 0;
-        countRow(self, iterator.coord, direction, &friends, &enemies);
-        if ((enemies == 0) && (friends > 0)) {
-          counters[friends][friend]++;
-        }
-        if ((friends == 0) && (enemies > 0)) {
-          counters[enemies][enemy]++;
-        }
-      }
+      countRowsInAllDirection(self, iterator.coord,
+                              friendCounters, enemyCounters);
     }
     double weight = 1;
     int distance;
     for(distance = 1; distance < self->winnerRowSize; distance++) {
-      score -= counters[distance][enemy] * weight;
+      score -= enemyCounters[distance] * weight;
       weight *= ((Game *)self)->board.height * ((Game *)self)->board.width;
-      score += counters[distance][friend] * weight;
+      score += friendCounters[distance] * weight;
       weight *= ((Game *)self)->board.height * ((Game *)self)->board.width;
     }
     return score;
+  }
+}
+
+static void countRowsInAllDirection(Gomoko *self, BoardCoord coord,
+                                    int friendCounters[], int enemyCounters[])
+{
+  Direction direction;
+  for(direction =  halfRoundDirectionBegin;
+      direction <= roundDirectionEnd;
+      direction++)
+  {
+    int friends = 0;
+    int enemies = 0;
+    countRow(self, coord, direction, &friends, &enemies);
+    if ((enemies == 0) && (friends > 0)) {
+      friendCounters[friends]++;
+    }
+    if ((friends == 0) && (enemies > 0)) {
+      enemyCounters[enemies]++;
+    }
   }
 }
 
