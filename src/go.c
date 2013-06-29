@@ -3,9 +3,12 @@
 
    Copyright (C) 2013 Goro Team <https://github.com/goro-dev?tab=members> */
 
+#include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "game.h"
+#include "minimax.h"
 #include "go.h"
 #include "boarditerator.h"
 #include "group.h"
@@ -76,7 +79,7 @@ static Go *copyGoGame(Go *self)
 
 static int validGoMove(Go *self, BoardCoord coord)
 {
-  if (getBoardCell(self->game.board, coord) != emptyBoardCell) {
+  if (getBoardCell(&self->game.board, coord) != emptyBoardCell) {
     return(0);
   } else {
     Go *copy = copyGoGame(self);
@@ -92,7 +95,7 @@ static int validGoMove(Go *self, BoardCoord coord)
 }
 
 static int goMoveDiedInstantly(Go *self, BoardCoord coord) {
-  return getBoardCell(self->game.board, coord) == emptyBoardCell;
+  return getBoardCell(&self->game.board, coord) == emptyBoardCell;
 }
 
 static int repeatedGoPosition(Go *self) {
