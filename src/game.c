@@ -55,9 +55,19 @@ void gameMove(Game *self, BoardCoord coord)
 
 static void switchGamePlayer(Game *self)
 {
-  self->actualPlayer = (self->actualPlayer == firstPlayer)
-                       ? secondPlayer
-                       : firstPlayer;
+  self->actualPlayer = otherGamePlayer(self);
+}
+
+PlayerId actualGamePlayer(Game *self)
+{
+  return self->actualPlayer;
+}
+
+PlayerId otherGamePlayer(Game *self)
+{
+  return (self->actualPlayer == firstPlayer)
+         ? secondPlayer
+         : firstPlayer;
 }
 
 int nextValidGameMove(Game *self, BoardIterator *iterator)

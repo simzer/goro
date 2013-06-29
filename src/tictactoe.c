@@ -15,6 +15,7 @@ static PlayerId ticTacToeWinner(Game *self);
 static double evalTicTacToePosition(Game *self);
 
 static const GameVirtualTable ticTacToeVirtualTable = {
+  &gameMove,
   &validTicTacToeMove,
   0,
   &ticTacToeGameOver,

@@ -56,13 +56,14 @@ extern const BoardCoord directionCoords[directionNumber];
 typedef struct {
   BoardSize width;
   BoardSize height;
-  char *board;
+  char *cells;
 } Board;
 
 extern Board createBoard(BoardSize width, BoardSize height);
 extern Board loadBoard(FILE *file);
 extern Board copyBoard(Board *self);
 extern void clearBoard(Board *self);
+extern int boardEqual(Board *self, Board *ref);
 extern void destructBoard(Board *self);
 extern BoardCell getBoardCell(Board *self, BoardCoord coord);
 extern void setBoardCell(Board *self, BoardCoord coord, BoardCell cell);

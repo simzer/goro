@@ -19,6 +19,7 @@ typedef enum {
 typedef struct Game Game;
 
 typedef struct GameVirtualTable {
+  void (*move)(Game *self, BoardCoord coord);
   int (*validMove)(Game *self, BoardCoord coord);
   int (*moveWorthChecking)(Game *self, BoardCoord coord);
   int (*over)(Game *self);
@@ -42,5 +43,7 @@ extern void gameMove(Game *self, BoardCoord coord);
 extern BoardCell actualGamePlayerCell(Game *self);
 extern int nextValidGameMove(Game *self, BoardIterator *iterator);
 extern int nextMoveWorthChecking(Game *self, BoardIterator *iterator);
+extern PlayerId otherGamePlayer(Game *self);
+extern PlayerId actualGamePlayer(Game *self);
 
 #endif

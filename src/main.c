@@ -29,12 +29,12 @@ int main(int argc, char *argv[])
     tictactoe = createTicTacToe(3);
     game = &tictactoe;
   } else {
-    gomoko = createGomoko(createBoard(9,9));
+    gomoko = createGomoko(createBoard(19,19));
     gomoko.winnerRowSize = 5;
     game = &gomoko;
   }
   computer = createMiniMax(game);
-  computer.lookahead = 4;
+  computer.lookahead = 3;
   human = createCLIPlayer(game);
 
   while(!game->vtable->over(game))

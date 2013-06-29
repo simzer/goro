@@ -22,6 +22,7 @@ static double evalGomokoPosition(Gomoko *self);
 static Gomoko *copyGomokoGame(Gomoko *self);
 
 static const GameVirtualTable gomokoVirtualtable = {
+  &gameMove,
   &validGomokoMove,
   &gomokoMoveWorthChecking,
   &gomokoGameOver,

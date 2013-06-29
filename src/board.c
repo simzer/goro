@@ -96,30 +96,30 @@ Board createBoard(BoardSize width,
   Board self;
   self.width  = width;
   self.height = height;
-  self.board  = malloc(width * height * sizeof(self.board[0]));
-  assert(self.board != 0);
+  self.cells  = malloc(width * height * sizeof(self.cells[0]));
+  assert(self.cells != 0);
   clearBoard(&self);
   return self;
 }
 
 void clearBoard(Board *self)
 {
-  memset(self->board, emptyBoardCell,
-         self->width * self->height * sizeof(self->board[0]));
+  memset(self->cells, emptyBoardCell,
+         self->width * self->height * sizeof(self->cells[0]));
 }
 
 Board copyBoard(Board *self)
 {
   Board board = createBoard(self->width, self->height);
-  memcpy(board.board, self->board,
-         self->width * self->height * sizeof(self->board[0]));
+  memcpy(board.cells, self->cells,
+         self->width * self->height * sizeof(self->cells[0]));
   return(board);
 }
 
 void destructBoard(Board *self)
 {
-  free(self->board);
-  self->board = 0;
+  free(self->cells);
+  self->cells = 0;
 }
 
 int coordInBoard(Board *self, BoardCoord coord)
@@ -147,14 +147,14 @@ int boardCellHasNeighbour(Board *self, BoardCoord coord)
 BoardCell getBoardCell(Board *self, BoardCoord coord)
 {
   if(coordInBoard(self, coord))
-    return self->board[coord.row*self->width + coord.col];
+    return self->cells[coord.row*self->width + coord.col];
   return invalidBoardCell;
 }
 
 void setBoardCell(Board *self, BoardCoord coord, BoardCell cell)
 {
   assert(coordInBoard(self, coord));
-  self->board[coord.row * self->width + coord.col] = cell;
+  self->cells[coord.row * self->width + coord.col] = cell;
 }
 
 void printBoard(Board *self)
@@ -184,13 +184,32 @@ int boardHasEmptyCell(Board *self)
   return(emptyCellCount > 0);
 }
 
+int boardEqual(Board *self, Board *ref)
+{
+  if (   (self->height != ref->height)
+      || (self->width != ref->width))
+  {
+    return 0;
+  } else {
+    int equal = 1;
+    BoardIterator iterator = createBoardIterator(self);
+    while(!boardIteratorFinished(&iterator)) {
+      if (getBoardCell(self, iterator.coord) != getBoardCell(ref, iterator.coord))
+      {
+        equal = 0;
+      }
+    }
+    return equal;
+  }
+}
+
 void saveBoard(Board *self, FILE *file)
 {
   BoardSize width  = self->width;
   BoardSize height = self->height;
   if(    ( fwrite(&width,       sizeof(int), 1, file) == 1 )
       && ( fwrite(&height,      sizeof(int), 1, file) == 1 )
-      && ( fwrite(self->board, sizeof(self->board[0]),
+      && ( fwrite(self->cells, sizeof(self->cells[0]),
                   width*height, file) == width*height) )
   {
     return;
@@ -210,7 +229,7 @@ Board loadBoard(FILE *file)
       && (fread(&height, sizeof(int), 1, file) == 1) )
   {
     self = createBoard(width, height);
-    if (   fread(self.board, sizeof(self.board[0]), width*height, file)
+    if (   fread(self.cells, sizeof(self.cells[0]), width*height, file)
         == width*height)
     {
       return(self);

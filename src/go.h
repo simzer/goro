@@ -8,6 +8,12 @@
 
 #include "game.h"
 
-extern Game createGo(Board board);
+typedef struct Go {
+  Game game;
+  Game *history[2];
+  double komi;
+} Go;
+
+extern Go createGo(Board board);
 
 #endif
