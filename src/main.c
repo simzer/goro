@@ -14,13 +14,14 @@
 #include "cliplayer.h"
 #include "minimax.h"
 
+static void printWinnerPosition(Game *game);
+
 int main(int argc, char *argv[])
 {
   Game game;
   MiniMax computer = createMiniMax(&game);
   CLIPlayer human = createCLIPlayer(&game);
   Player *players[2] = { &human, &computer };
-  PlayerId winner;
 
   if ((argc > 1) && (strcmp(argv[1], "--tictactoe") == 0)) {
     game = createTicTacToe(3);
@@ -29,26 +30,22 @@ int main(int argc, char *argv[])
     game = createGomoko(createBoard(9,9));
   }
 
-  while(winner = game.vtable->winner(&game),
-        (   winner == noPlayer
-         && game.vtable->movesPossible(&game)) )
+  while(!game.vtable->over(&game))
   {
     BoardCoord coord;
     BoardCoordString string;
-    Player *actualPlayer;
-    switchGamePlayer(&game);
-    printBoard(&game.board);
-    actualPlayer = players[game.actualPlayer];
-    coord = actualPlayer->getMove(actualPlayer);
-    setBoardCell(&game.board, coord, actualGamePlayerCell(&game));
-    string = boardCoordToString(coord);
-    printf("Player %s step: %s\n",
-           gamePlayerNames[game.actualPlayer], string.chars);
+    coord = players[game.actualPlayer]->getMove(players[game.actualPlayer]);
+    gameMove(&game, coord);
   }
-  printBoard(&game.board);
+  printWinnerPosition(&game);
+  return 0;
+}
+
+static void printWinnerPosition(Game *game)
+{
+  PlayerId winner = game->vtable->winner(game);
+  printBoard(&game->board);
   printf(winner == noPlayer
          ? "Nobody won!\n"
          : "%s won!\n", gamePlayerNames[winner]);
-
-  return 0;
 }

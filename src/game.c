@@ -5,6 +5,8 @@
 
 #include "game.h"
 
+static void switchGamePlayer(Game *self);
+
 const BoardCell gamePlayerCells[numberOfPlayers] = {
   blackBoardCell,
   whiteBoardCell
@@ -23,7 +25,7 @@ BoardCell actualGamePlayerCell(Game *self)
 Game createGame(Board board)
 {
   Game self;
-  self.actualPlayer = noPlayer;
+  self.actualPlayer = firstPlayer;
   self.board = board;
   return self;
 }
@@ -35,11 +37,17 @@ Game copyGame(Game *self)
   return(game);
 }
 
-void switchGamePlayer(Game *self)
+void gameMove(Game *self, BoardCoord coord)
+{
+  setBoardCell(&self->board, coord, actualGamePlayerCell(self));
+  switchGamePlayer(self);
+}
+
+static void switchGamePlayer(Game *self)
 {
   self->actualPlayer = (self->actualPlayer == firstPlayer)
-                    ? secondPlayer
-                    : firstPlayer;
+                       ? secondPlayer
+                       : firstPlayer;
 }
 
 int nextValidGameMove(Game *self, BoardIterator *iterator)

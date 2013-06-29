@@ -10,13 +10,13 @@
 #include "boarditerator.h"
 
 static int validTicTacToeMove(Game *self, BoardCoord coord);
-static int possibleTicTacToeMoves(Game *self);
+static int ticTacToeGameOver(Game *self);
 static PlayerId ticTacToeWinner(Game *self);
 static double evalTicTacToePosition(Game *self);
 
 static const GameVirtualTable ticTacToeVirtualTable = {
   &validTicTacToeMove,
-  &possibleTicTacToeMoves,
+  &ticTacToeGameOver,
   &ticTacToeWinner,
   &evalTicTacToePosition
 };
@@ -33,9 +33,10 @@ static int validTicTacToeMove(Game *self, BoardCoord coord)
   return getBoardCell(&(self->board), coord) == emptyBoardCell;
 }
 
-static int possibleTicTacToeMoves(Game *self)
+static int ticTacToeGameOver(Game *self)
 {
-  return boardHasEmptyCell(&self->board);
+  return    !boardHasEmptyCell(&self->board)
+         || (ticTacToeWinner(self) != noPlayer);
 }
 
 static PlayerId ticTacToeWinner(Game *self)
@@ -72,7 +73,7 @@ static PlayerId ticTacToeWinner(Game *self)
 
 static double evalTicTacToePosition(Game *self)
 {
-  PlayerId winner = self->vtable->winner(self);
+  PlayerId winner = ticTacToeWinner(self);
   return (winner == self->actualPlayer ? miniMaxWinScore :
           winner == noPlayer     ? 0 :
                                       miniMaxLoseScore );

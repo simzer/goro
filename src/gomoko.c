@@ -9,7 +9,7 @@
 #include "boarditerator.h"
 
 static int validGomokoMove(Game *self, BoardCoord coord);
-static int possibleGomokoMoves(Game *self);
+static int gomokoGameOver(Game *self);
 static PlayerId gomokoWinner(Game *self);
 static double evalGomokoPosition(Game *self);
 
@@ -17,7 +17,7 @@ static const BoardSize gomokoWinnerRowSize = 5;
 
 static const GameVirtualTable gomokoVirtualtable = {
   &validGomokoMove,
-  &possibleGomokoMoves,
+  &gomokoGameOver,
   &gomokoWinner,
   &evalGomokoPosition
 };
@@ -34,9 +34,10 @@ static int validGomokoMove(Game *self, BoardCoord coord)
   return getBoardCell(&(self->board), coord) == emptyBoardCell;
 }
 
-static int possibleGomokoMoves(Game *self)
+static int gomokoGameOver(Game *self)
 {
-  return boardHasEmptyCell(&self->board);
+  return    !boardHasEmptyCell(&self->board)
+         || (gomokoWinner(self) != noPlayer);
 }
 
 static PlayerId gomokoWinner(Game *self)

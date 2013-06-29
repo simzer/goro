@@ -21,10 +21,12 @@ static BoardCoord getCLIPlayerMove(CLIPlayer *self)
   BoardCoordString string;
   int  rowIndex;
   Game* game = ((Player *)self)->game;
-  printf("Player %d step: ", game->actualPlayer);
+  printBoard(&game->board);
   do {
+    printf("Player %d step: ", game->actualPlayer);
     scanf("%3s", string.chars);
     coord = stringToBoardCoord(string);
-  } while (!game->vtable->validMove(game, coord));
+  } while (!game->vtable->validMove(game, coord)
+           && (printf("Invalid move.\n"),1) );
   return(coord);
 }

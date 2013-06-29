@@ -10,13 +10,13 @@
 #include "boarditerator.h"
 
 static int validGoMove(Game *self, BoardCoord coord);
-static int possibleGoMoves(Game *self);
+static int goGameOver(Game *self);
 static PlayerId goWinner(Game *self);
 static double evalGoPosition(Game *self);
 
 static const GameVirtualTable goVirtualtable = {
   &validGoMove,
-  &possibleGoMoves,
+  &goGameOver,
   &goWinner,
   &evalGoPosition
 };
@@ -43,7 +43,7 @@ static int validGoMove(Game *self, BoardCoord coord)
   */
 }
 
-static int possibleGoMoves(Game *self)
+static int goGameOver(Game *self)
 {
   // to be implemented
 }

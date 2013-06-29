@@ -12,9 +12,9 @@
 static BoardCoord getMiniMaxMove(MiniMax *self);
 
 static double searchMaxScore(const MiniMax *self,
-                            BoardCoord *coord,
-                            Game *game,
-                            int lookahead);
+                             BoardCoord *coord,
+                             Game *game,
+                             int lookahead);
 
 const double miniMaxWinScore = INFINITY;
 const double miniMaxLoseScore = -INFINITY;
@@ -28,31 +28,28 @@ MiniMax createMiniMax(Game *game) {
 }
 
 static double searchMaxScore(const MiniMax *self,
-                            BoardCoord *coord,
-                            Game *game,
-                            int lookahead)
+                             BoardCoord *coord,
+                             Game *game,
+                             int lookahead)
 {
   double result;
-  PlayerId winner = game->vtable->winner(game);
-  if (   game->vtable->movesPossible(game)
-      && (winner == noPlayer)
+  if (   !game->vtable->over(game)
       && (lookahead > 0))
   {
     double score;
     double maxScore = -INFINITY;
     BoardCoord maxScoredCoord;
     BoardIterator iterator = createBoardIterator(&game->board);
-    for(;nextValidGameMove(game, &iterator);) {
+    while(nextValidGameMove(game, &iterator)) {
       BoardCoord ignoredCoord;
       Game nextGame = copyGame(game);
-      switchGamePlayer(&nextGame);
-      setBoardCell(&nextGame.board, iterator.coord, actualGamePlayerCell(game));
+      gameMove(&nextGame, iterator.coord);
       score = - searchMaxScore(self, &ignoredCoord, &nextGame, lookahead-1);
       destructBoard(&nextGame.board);
       if (score > maxScore) {
         maxScore = score;
         maxScoredCoord = iterator.coord;
-        }
+      }
     }
     *coord = maxScoredCoord;
     result = maxScore;
