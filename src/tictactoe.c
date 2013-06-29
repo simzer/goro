@@ -9,6 +9,10 @@
 #include "game.h"
 #include "boarditerator.h"
 
+static int playerWon(Game *self, PlayerId player);
+static int anyCrossingLineFilled(Game *self, BoardCoord coord, BoardCell cell);
+static int anyDiagonalFilled(Game *self, BoardCell cell);
+
 static int validTicTacToeMove(Game *self, BoardCoord coord);
 static int ticTacToeGameOver(Game *self);
 static PlayerId ticTacToeWinner(Game *self);
@@ -44,34 +48,53 @@ static int ticTacToeGameOver(Game *self)
 
 static PlayerId ticTacToeWinner(Game *self)
 {
-  BoardSize size = self->board.width;
-  BoardSize i, j;
   PlayerId player;
-  BoardCoord coord;
   for(player = firstPlayer; player < numberOfPlayers; player++) {
-    int fullLeftDiagonal = 1;
-    int fullRightDiagonal = 1;
-    for(i = 0; i < size; i++) {
-      int fullRow = 1;
-      int fullCol = 1;
-      for(j = 0; j < size; j++) {
-        fullRow &= getBoardCell(&(self->board), createBoardCoord(i, j))
-                    == gamePlayerCells[player];
-        fullCol &= getBoardCell(&(self->board), createBoardCoord(j, i))
-                    == gamePlayerCells[player];
-      }
-      if (fullRow || fullCol) return(player);
-
-      fullLeftDiagonal &= getBoardCell(&(self->board),
-                                        createBoardCoord(i, i))
-                          == gamePlayerCells[player];
-      fullRightDiagonal &= getBoardCell(&(self->board),
-                                        createBoardCoord(i, size - 1 - i))
-                           == gamePlayerCells[player];
-    }
-    if (fullLeftDiagonal || fullRightDiagonal) return(player);
+    if(playerWon(self, player)) return player;
   }
   return(noPlayer);
+}
+
+static int playerWon(Game *self, PlayerId player)
+{
+  BoardSize i;
+  for(i = 0; i < self->board.width; i++) {
+    if(anyCrossingLineFilled(self, createBoardCoord(i, i),
+                             gamePlayerCells[player]))
+      return(1);
+  }
+  if(anyDiagonalFilled(self, gamePlayerCells[player])) return 1;
+  return 0;
+}
+
+static int anyCrossingLineFilled(Game *self, BoardCoord coord, BoardCell cell)
+{
+  int j;
+  int fullRow = 1;
+  int fullCol = 1;
+  for(j = 0; j < self->board.width; j++) {
+    fullRow &= getBoardCell(&(self->board), createBoardCoord(coord.col, j))
+                == cell;
+    fullCol &= getBoardCell(&(self->board), createBoardCoord(j, coord.row))
+                == cell;
+  }
+  return fullRow || fullCol;
+}
+
+static int anyDiagonalFilled(Game *self, BoardCell cell)
+{
+  BoardSize i;
+  int fullLeftDiagonal = 1;
+  int fullRightDiagonal = 1;
+  for(i = 0; i < self->board.width; i++) {
+    fullLeftDiagonal &=
+        getBoardCell(&(self->board),
+                     createBoardCoord(i, i)) == cell;
+    fullRightDiagonal &=
+        getBoardCell(&(self->board),
+                     createBoardCoord(i, self->board.width - 1 - i)) == cell;
+  }
+  return fullLeftDiagonal || fullRightDiagonal;
 }
 
 static double evalTicTacToePosition(Game *self)
