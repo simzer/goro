@@ -97,5 +97,7 @@ void printGameOverInfo(Game *game)
   printBoard(&game->board);
   printf(winner == noPlayer
          ? "Nobody won!\n"
-         : "%s won!\n", gamePlayerNames[winner]);
+         : "%s (%s) won!\n",
+           gamePlayerNames[winner],
+           boardCellNames[gamePlayerCells[winner]]);
 }

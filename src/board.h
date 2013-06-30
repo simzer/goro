@@ -16,6 +16,7 @@ typedef enum BoardCell {
   whiteBoardCell = 2,
   invalidBoardCell = 3
 } BoardCell;
+extern const char* boardCellNames[];
 extern int boardCellFilled(BoardCell self);
 
 typedef struct {

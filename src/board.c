@@ -15,6 +15,10 @@
 
 const char boardSigns[] = { '.', '@', 'O'};
 
+const char* boardCellNames[] = {
+  "empty", "black", "white", "invalid"
+};
+
 int boardCellFilled(BoardCell self)
 {
   return    self != emptyBoardCell
