@@ -45,5 +45,6 @@ extern int nextValidGameMove(Game *self, BoardIterator *iterator);
 extern int nextMoveWorthChecking(Game *self, BoardIterator *iterator);
 extern PlayerId otherGamePlayer(Game *self);
 extern PlayerId actualGamePlayer(Game *self);
+extern void printGameOverInfo(Game *game);
 
 #endif

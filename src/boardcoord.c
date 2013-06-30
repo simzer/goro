@@ -11,6 +11,11 @@
 
 #include "boardcoord.h"
 
+const BoardSize standardBoardSizes[standardBoardTypes] =
+{
+  3, 5, 9, 13, 17, 19
+};
+
 const BoardCoord nullBoardCoord = { -1, -1 };
 
 static const char boardColumnCharacters[] = "ABCDEFGHJKLMNOPQRST";

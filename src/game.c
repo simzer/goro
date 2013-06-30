@@ -90,3 +90,12 @@ int nextMoveWorthChecking(Game *self, BoardIterator *iterator)
           && !self->vtable->moveWorthChecking(self, iterator->coord));
   return result;
 }
+
+void printGameOverInfo(Game *game)
+{
+  PlayerId winner = game->vtable->winner(game);
+  printBoard(&game->board);
+  printf(winner == noPlayer
+         ? "Nobody won!\n"
+         : "%s won!\n", gamePlayerNames[winner]);
+}

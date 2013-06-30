@@ -6,17 +6,17 @@
 #include <math.h>
 
 #include "minimax.h"
-#include "game.h"
+#include "tictactoe.h"
 #include "boarditerator.h"
 
-static int playerWon(Game *self, PlayerId player);
-static int anyCrossingLineFilled(Game *self, BoardCoord coord, BoardCell cell);
-static int anyDiagonalFilled(Game *self, BoardCell cell);
+static int playerWon(TicTacToe *self, PlayerId player);
+static int anyCrossingLineFilled(TicTacToe *self, BoardCoord coord, BoardCell cell);
+static int anyDiagonalFilled(TicTacToe *self, BoardCell cell);
 
-static int validTicTacToeMove(Game *self, BoardCoord coord);
-static int ticTacToeGameOver(Game *self);
-static PlayerId ticTacToeWinner(Game *self);
-static double evalTicTacToePosition(Game *self);
+static int validTicTacToeMove(TicTacToe *self, BoardCoord coord);
+static int ticTacToeGameOver(TicTacToe *self);
+static PlayerId ticTacToeWinner(TicTacToe *self);
+static double evalTicTacToePosition(TicTacToe *self);
 
 static const GameVirtualTable ticTacToeVirtualTable = {
   &gameMove,
@@ -28,25 +28,25 @@ static const GameVirtualTable ticTacToeVirtualTable = {
   &copyGame
 };
 
-Game createTicTacToe(BoardSize size)
+TicTacToe createTicTacToe(BoardSize size)
 {
-  Game self = createGame(createBoard(size, size));
+  TicTacToe self = createGame(createBoard(size, size));
   self.vtable = &ticTacToeVirtualTable;
   return self;
 }
 
-static int validTicTacToeMove(Game *self, BoardCoord coord)
+static int validTicTacToeMove(TicTacToe *self, BoardCoord coord)
 {
   return getBoardCell(&(self->board), coord) == emptyBoardCell;
 }
 
-static int ticTacToeGameOver(Game *self)
+static int ticTacToeGameOver(TicTacToe *self)
 {
   return    !boardHasEmptyCell(&self->board)
          || (ticTacToeWinner(self) != noPlayer);
 }
 
-static PlayerId ticTacToeWinner(Game *self)
+static PlayerId ticTacToeWinner(TicTacToe *self)
 {
   PlayerId player;
   for(player = firstPlayer; player < numberOfPlayers; player++) {
@@ -55,7 +55,7 @@ static PlayerId ticTacToeWinner(Game *self)
   return(noPlayer);
 }
 
-static int playerWon(Game *self, PlayerId player)
+static int playerWon(TicTacToe *self, PlayerId player)
 {
   BoardSize i;
   for(i = 0; i < self->board.width; i++) {
@@ -67,7 +67,7 @@ static int playerWon(Game *self, PlayerId player)
   return 0;
 }
 
-static int anyCrossingLineFilled(Game *self, BoardCoord coord, BoardCell cell)
+static int anyCrossingLineFilled(TicTacToe *self, BoardCoord coord, BoardCell cell)
 {
   int j;
   int fullRow = 1;
@@ -81,7 +81,7 @@ static int anyCrossingLineFilled(Game *self, BoardCoord coord, BoardCell cell)
   return fullRow || fullCol;
 }
 
-static int anyDiagonalFilled(Game *self, BoardCell cell)
+static int anyDiagonalFilled(TicTacToe *self, BoardCell cell)
 {
   BoardSize i;
   int fullLeftDiagonal = 1;
@@ -97,7 +97,7 @@ static int anyDiagonalFilled(Game *self, BoardCell cell)
   return fullLeftDiagonal || fullRightDiagonal;
 }
 
-static double evalTicTacToePosition(Game *self)
+static double evalTicTacToePosition(TicTacToe *self)
 {
   PlayerId winner = ticTacToeWinner(self);
   return (winner == self->actualPlayer ? miniMaxWinScore :

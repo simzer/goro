@@ -12,7 +12,18 @@ typedef struct BoardCoordString {
   char chars[4];
 } BoardCoordString;
 
+typedef enum {
+  nanoBoard,
+  mikroBoard,
+  smallBoard,
+  mediumBoard,
+  tibetanBoard,
+  normalBoard,
+  standardBoardTypes
+} StandardBoardType;
+
 typedef int BoardSize;
+extern const BoardSize standardBoardSizes[standardBoardTypes];
 extern BoardSize charToBoardColumn(char character);
 extern char boardColumnToChar(BoardSize column);
 

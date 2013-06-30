@@ -25,6 +25,7 @@ typedef struct {
 } Board;
 
 extern Board createBoard(BoardSize width, BoardSize height);
+extern Board createSquareBoard(BoardSize size);
 extern Board loadBoard(FILE *file);
 extern Board copyBoard(Board *self);
 extern void clearBoard(Board *self);

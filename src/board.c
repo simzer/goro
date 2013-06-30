@@ -33,6 +33,10 @@ Board createBoard(BoardSize width,
   return self;
 }
 
+Board createSquareBoard(BoardSize size) {
+  return createBoard(size, size);
+}
+
 void clearBoard(Board *self)
 {
   memset(self->cells, emptyBoardCell,
