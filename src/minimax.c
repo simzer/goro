@@ -23,7 +23,7 @@ MiniMax createMiniMax(Game *game) {
   MiniMax self;
   self.player.getMove = &getMiniMaxMove;
   self.player.game = game;
-  self.lookahead = 5;
+  self.lookahead = 6;
   return self;
 }
 
@@ -43,7 +43,7 @@ static double searchMaxScore(const MiniMax *self,
     while(nextMoveWorthChecking(game, &iterator)) {
       BoardCoord ignoredCoord;
       Game *nextGame = game->vtable->copy(game);
-      gameMove(nextGame, iterator.coord);
+      nextGame->vtable->move(nextGame, iterator.coord);
       score = - searchMaxScore(self, &ignoredCoord, nextGame, lookahead-1);
       destructGame(nextGame);
       if (score >= maxScore) {
