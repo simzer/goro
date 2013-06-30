@@ -58,14 +58,14 @@ static void goMove(Go *self, BoardCoord coord)
 }
 
 static void removeDeadGroups(Go *self, BoardCell cell) {
-  Groups groups = createGroups(&(self->game.board));
-  GroupIterator iterator = createGroupIterator(&groups);
+  GroupList groupList = createGroupList(&(self->game.board));
+  GroupIterator iterator = createGroupIterator(&groupList);
   while(getGroupsByColor(&iterator, cell)) {
     if (groupLiberties(iterator.group) == 0) {
       removeGroup(iterator.group);
     }
   }
-  destructGroups(&groups);
+  destructGroupList(&groupList);
 }
 
 static Go *copyGoGame(Go *self)
@@ -125,14 +125,14 @@ static int goGameOver(Go *self)
 
 static int countGoTerritory(Go *self, BoardCell cell) {
   int territory = 0;
-  Groups groups = createGroups(&(self->game.board));
-  GroupIterator iterator = createGroupIterator(&groups);
+  GroupList groupLists = createGroupList(&(self->game.board));
+  GroupIterator iterator = createGroupIterator(&groupLists);
   while(getTerritories(&iterator)) {
     if (territoryOwner(iterator.group) == cell) {
       territory += iterator.group->size;
     }
   }
-  destructGroups(&groups);
+  destructGroupList(&groupLists);
   return 0;
 }
 

@@ -10,8 +10,8 @@
 #include "boarditerator.h"
 #include "group.h"
 
-static Group getAGroup(Board *board);
-static void collectGroup(Group *group, BoardCoord coord);
+static Group collectNextGroup(Board *board);
+static void collectGroup(Group *self, BoardCoord coord);
 
 Group createGroup(Board *board)
 {
@@ -100,52 +100,54 @@ BoardCell territoryOwner(Group *self)
   return owner;
 }
 
-Groups createGroups(Board *board)
+GroupList createGroupList(Board *board)
 {
-  Groups self;
+  GroupList self;
   Group group;
   Board tempBoard = copyBoard(board);
   self.groupNumber = 0;
-  while(group = getAGroup(&tempBoard),
+  self.groups = malloc(0);
+  while(group = collectNextGroup(&tempBoard),
         group.size != 0)
   {
     group.board = board;
     self.groupNumber++;
-    self.groups = malloc(self.groupNumber * sizeof(Group));
+    self.groups = realloc(self.groups, self.groupNumber * sizeof(Group));
     self.groups[self.groupNumber-1] = group;
   }
   return self;
 }
 
-static Group getAGroup(Board *board)
+static Group collectNextGroup(Board *board)
 {
   Group group = createGroup(board);
   BoardIterator iterator = createBoardIterator(board);
   while(!boardIteratorFinished(&iterator)) {
     if(getBoardCell(board, iterator.coord) != invalidBoardCell) {
       collectGroup(&group, iterator.coord);
+      break;
     }
   }
   return group;
 }
 
-static void collectGroup(Group *group, BoardCoord coord)
+static void collectGroup(Group *self, BoardCoord coord)
 {
   NeighbourIterator iterator;
-  BoardCell referenceCell = getBoardCell(group->board, coord);
-  addCoordToGroup(group, coord);
-  setBoardCell(group->board, coord, invalidBoardCell);
+  BoardCell referenceCell = getBoardCell(self->board, coord);
+  addCoordToGroup(self, coord);
+  setBoardCell(self->board, coord, invalidBoardCell);
   iterator = createNeighbourIterator(coord,fourNeighbourhood);
   while(getNeighbours(&iterator)) {
-    if(   getBoardCell(group->board, iterator.neighbour)
+    if(   getBoardCell(self->board, iterator.neighbour)
        == referenceCell )
     {
-      collectGroup(group, iterator.neighbour);
+      collectGroup(self, iterator.neighbour);
     }
   }
 }
 
-void destructGroups(Groups *self)
+void destructGroupList(GroupList *self)
 {
   int i;
   for (i = 0; i < self->groupNumber; i++) {
@@ -155,17 +157,19 @@ void destructGroups(Groups *self)
   self->groups = 0;
 }
 
-void printGroups(Groups *self)
+void printGroupList(GroupList *self)
 {
   int i;
+  printf("(\n");
   for (i = 0; i < self->groupNumber; i++) {
-    printf("( group[%d] = ", i);
+    printf("group[%d] = ", i);
     printGroup(&self->groups[i]);
     printf(",");
   };
+  printf(")\n");
 }
 
-GroupIterator createGroupIterator(Groups *groups)
+GroupIterator createGroupIterator(GroupList *groups)
 {
   GroupIterator self;
   self.groups = groups;

@@ -22,19 +22,19 @@ extern void printGroup(Group *self);
 typedef struct Groups {
   Group *groups;
   int groupNumber;
-} Groups;
-extern Groups createGroups(Board *board);
-extern void destructGroups(Groups *self);
-extern void printGroups(Groups *self);
+} GroupList;
+extern GroupList createGroupList(Board *board);
+extern void destructGroupList(GroupList *self);
+extern void printGroupList(GroupList *self);
 
 
 typedef struct GroupIterator {
-  Groups *groups;
+  GroupList *groups;
   int index;
   Group *group;
 } GroupIterator;
 
-extern GroupIterator createGroupIterator(Groups *groups);
+extern GroupIterator createGroupIterator(GroupList *groups);
 extern int getGroups(GroupIterator *self);
 extern int getGroupsByColor(GroupIterator *self, BoardCell cell);
 extern int getTerritories(GroupIterator *self);
