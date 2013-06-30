@@ -15,6 +15,12 @@
 
 const char boardSigns[] = { '.', '@', 'O'};
 
+int boardCellFilled(BoardCell self)
+{
+  return    self != emptyBoardCell
+         && self != invalidBoardCell;
+}
+
 Board createBoard(BoardSize width,
                   BoardSize height)
 {
@@ -62,8 +68,7 @@ int boardCellHasNeighbour(Board *self, BoardCoord coord,
   while(getNeighbours(&iterator))
   {
     BoardCell neighbour = getBoardCell(self, iterator.neighbour);
-    hasNeighbour |= (neighbour != invalidBoardCell)
-                    && (neighbour != emptyBoardCell);
+    hasNeighbour |= boardCellFilled(neighbour);
   }
   return hasNeighbour;
 }
@@ -79,6 +84,12 @@ void setBoardCell(Board *self, BoardCoord coord, BoardCell cell)
 {
   assert(coordInBoard(self, coord));
   self->cells[coord.row * self->width + coord.col] = cell;
+}
+
+void clearBoardCell(Board *self, BoardCoord coord)
+{
+  assert(coordInBoard(self, coord));
+  self->cells[coord.row * self->width + coord.col] = emptyBoardCell;
 }
 
 void printBoard(Board *self)

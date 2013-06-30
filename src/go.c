@@ -23,7 +23,7 @@ static void goMove(Go *self, BoardCoord coord);
 static int repeatedGoPosition(Go *self);
 static int goMoveDiedInstantly(Go *self, BoardCoord coord);
 static void removeDeadGroups(Go *self, BoardCell cell);
-static int goTerritory(Go *self, BoardCell cell);
+static int countGoTerritory(Go *self, BoardCell cell);
 
 static const GameVirtualTable goVirtualtable = {
   &goMove,
@@ -58,13 +58,14 @@ static void goMove(Go *self, BoardCoord coord)
 }
 
 static void removeDeadGroups(Go *self, BoardCell cell) {
-  Group group;
-  GroupIterator iterator = createGroupIterator(&(self->game.board));
-  while(!groupIteratorFinished(&iterator)) {
+  Groups groups = createGroups(&(self->game.board));
+  GroupIterator iterator = createGroupIterator(&groups);
+  while(getGroupsByColor(&iterator, cell)) {
     if (groupLiberties(iterator.group) == 0) {
       removeGroup(iterator.group);
     }
   }
+  destructGroups(&groups);
 }
 
 static Go *copyGoGame(Go *self)
@@ -119,17 +120,25 @@ static int goGameOver(Go *self)
   return gameOver;
 }
 
-static int goTerritory(Go *self, BoardCell cell) {
-  // todo implement
-  assert(0);
+static int countGoTerritory(Go *self, BoardCell cell) {
+  int territory = 0;
+  Groups groups = createGroups(&(self->game.board));
+  GroupIterator iterator = createGroupIterator(&groups);
+  while(getTerritories(&iterator)) {
+    if (territoryOwner(iterator.group) == cell) {
+      territory += iterator.group->size;
+    }
+  }
+  destructGroups(&groups);
   return 0;
 }
 
 static PlayerId goWinner(Go *self)
 {
   if(goGameOver(self)) {
-    return (  goTerritory(self, gamePlayerCells[firstPlayer])
-            > goTerritory(self, gamePlayerCells[secondPlayer]) + self->komi )
+    return (  countGoTerritory(self, gamePlayerCells[firstPlayer])
+            > countGoTerritory(self, gamePlayerCells[secondPlayer])
+              + self->komi )
            ? firstPlayer : secondPlayer;
   } else {
     return(noPlayer);

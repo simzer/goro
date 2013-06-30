@@ -11,16 +11,31 @@ typedef struct Group {
   BoardCoord *cells;
   int size;
 } Group;
-
+extern Group createGroup(Board *board);
+extern void addCoordToGroup(Group *self, BoardCoord coord);
+extern void destructGroup(Group *self);
 extern int groupLiberties(Group *self);
 extern void removeGroup(Group *self);
+extern BoardCell territoryOwner(Group *self);
+
+
+typedef struct Groups {
+  Group *groups;
+  int groupNumber;
+} Groups;
+extern Groups createGroups(Board *board);
+extern void destructGroups(Groups *self);
+
 
 typedef struct GroupIterator {
-  Board *board;
+  Groups *groups;
+  int index;
   Group *group;
 } GroupIterator;
 
-extern GroupIterator createGroupIterator(Board *board);
-extern int groupIteratorFinished(GroupIterator *self);
+extern GroupIterator createGroupIterator(Groups *groups);
+extern int getGroups(GroupIterator *self);
+extern int getGroupsByColor(GroupIterator *self, BoardCell cell);
+extern int getTerritories(GroupIterator *self);
 
 #endif

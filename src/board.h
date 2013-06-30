@@ -16,6 +16,7 @@ typedef enum BoardCell {
   whiteBoardCell = 2,
   invalidBoardCell = 3
 } BoardCell;
+extern int boardCellFilled(BoardCell self);
 
 typedef struct {
   BoardSize width;
@@ -31,6 +32,7 @@ extern int boardEqual(Board *self, Board *ref);
 extern void destructBoard(Board *self);
 extern BoardCell getBoardCell(Board *self, BoardCoord coord);
 extern void setBoardCell(Board *self, BoardCoord coord, BoardCell cell);
+extern void clearBoardCell(Board *self, BoardCoord coord);
 extern int coordInBoard(Board *self, BoardCoord coord);
 extern void printBoard(Board *self);
 extern void saveBoard(Board *self, FILE *file);

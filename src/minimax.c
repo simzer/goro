@@ -28,7 +28,7 @@ MiniMax createMiniMax(Game *game) {
 }
 
 static double searchMaxScore(const MiniMax *self,
-                             BoardCoord *coord,
+                             BoardCoord *bestMove,
                              Game *game,
                              int lookahead)
 {
@@ -38,7 +38,7 @@ static double searchMaxScore(const MiniMax *self,
   {
     double score;
     double maxScore = -INFINITY;
-    BoardCoord maxScoredCoord = *coord;
+    BoardCoord maxScoredCoord = *bestMove;
     BoardIterator iterator = createBoardIterator(&game->board);
     while(nextMoveWorthChecking(game, &iterator)) {
       BoardCoord ignoredCoord;
@@ -51,7 +51,7 @@ static double searchMaxScore(const MiniMax *self,
         maxScoredCoord = iterator.coord;
       }
     }
-    *coord = maxScoredCoord;
+    *bestMove = maxScoredCoord;
     result = maxScore;
   } else {
     result = game->vtable->evalPosition(game);
