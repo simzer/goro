@@ -12,7 +12,7 @@ sub readSgf {
 sub move {
   my @chars = qw( a b c d e f g h j k l m n o p q r s t );
   my $col = $chars[ord($_[0]) - ord('a')];
-  my $row = ord($_[1]) - ord('a');
+  my $row = 19 - (ord($_[1]) - ord('a'));
   return "$col$row";
 }
 

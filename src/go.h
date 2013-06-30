@@ -15,5 +15,6 @@ typedef struct Go {
 } Go;
 
 extern Go createGo(Board board);
+extern void setGoHandicap(Go *self, int handicap);
 
 #endif

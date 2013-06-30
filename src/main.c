@@ -29,6 +29,7 @@ static void destructGoro(Goro *self);
 static void initGoroGameFromCLI(Goro *self);
 static void initGoroPlayersFromCLI(Goro *self);
 static void setDefaultNotInitializedPlayers(Goro *self);
+static void goParametersFromCLI(Goro *self);
 static PlayerId playerIdFromCLIOption(char *arg);
 static int boardSizeFromCLI(Goro *self);
 
@@ -133,8 +134,21 @@ static void initGoroGameFromCLI(Goro *self)
   if(self->game == 0) {
     self->game = malloc(sizeof(Go));
     *(Go *)self->game = createGo(createSquareBoard(boardSizeFromCLI(self)));
+    goParametersFromCLI(self);
   }
 }
+
+static void goParametersFromCLI(Goro *self)
+{
+  int index = self->cliArgument.size;
+  index--;
+  while((--index) >= 0)
+    if (strcmp(self->cliArgument.item[index], "--handicap") == 0)
+  {
+    setGoHandicap(self->game, atoi(self->cliArgument.item[index+1]));
+  }
+}
+
 
 static int boardSizeFromCLI(Goro *self)
 {

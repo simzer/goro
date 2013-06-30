@@ -25,6 +25,18 @@ static int goMoveDiedInstantly(Go *self, BoardCoord coord);
 static void removeDeadGroups(Go *self, BoardCell cell);
 static int countGoTerritory(Go *self, BoardCell cell);
 
+static const BoardCoordString standardHandicaps[][9] =
+{
+  {{"D4"}, {"Q16"}, {""}, },
+  {{"D4"}, {"Q16"}, {"D16"}},
+  {{"D4"}, {"Q16"}, {"D16"}, {"Q4"}},
+  {{"D4"}, {"Q16"}, {"D16"}, {"Q4"}, {"K10"}},
+  {{"D4"}, {"Q16"}, {"D16"}, {"Q4"}, {"D10"}, {"Q10"}},
+  {{"D4"}, {"Q16"}, {"D16"}, {"Q4"}, {"D10"}, {"Q10"}, {"K10"}},
+  {{"D4"}, {"Q16"}, {"D16"}, {"Q4"}, {"D10"}, {"Q10"}, {"K4"}, {"K16"}},
+  {{"D4"}, {"Q16"}, {"D16"}, {"Q4"}, {"D10"}, {"Q10"}, {"K4"}, {"K16"}, {"K10"}},
+};
+
 static const GameVirtualTable goVirtualtable = {
   &goMove,
   &validGoMove,
@@ -34,6 +46,17 @@ static const GameVirtualTable goVirtualtable = {
   &evalGoPosition,
   &copyGoGame
 };
+
+void setGoHandicap(Go *self, int handicap) {
+  int i;
+  assert(handicap >=2 && handicap <= 9);
+  for(i = 0; i < handicap; i++) {
+    setBoardCell(&self->game.board,
+                 stringToBoardCoord(standardHandicaps[handicap-2][i]),
+                 gamePlayerCells[firstPlayer]);
+  }
+  self->game.actualPlayer = secondPlayer;
+}
 
 Go createGo(Board board)
 {

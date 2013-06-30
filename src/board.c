@@ -99,15 +99,18 @@ void clearBoardCell(Board *self, BoardCoord coord)
 void printBoard(Board *self)
 {
   BoardIterator iterator = createBoardIterator(self);
-  int i;
+  int col, row;
   printf("   ");
-  for(i = 0; i < self->width; i++) printf("%c ", boardColumnToChar(i));
+  for(col = 0; col < self->width; col++) {
+    printf("%c ", boardColumnToChar(col));
+  }
   printf("\n");
-  while(!boardIteratorFinished(&iterator))
-  {
-    if (iterator.coord.col == 0) printf("%2d ", iterator.coord.row+1);
-    printf("%c ", boardSigns[getBoardCell(self, iterator.coord)]);
-    if (iterator.coord.col == self->width-1) printf("\n");
+  for(row = self->height-1; row >= 0; row--) {
+    printf("%2d ", row+1);
+    for(col = 0; col < self->width; col++) {
+      printf("%c ", boardSigns[getBoardCell(self, createBoardCoord(row,col))]);
+    }
+    printf("\n");
   }
 }
 
