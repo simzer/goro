@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+
+sub readSgf {
+  open(SGF, shift);
+  my $sgf = join('',(<SGF>));
+  close(SGF);
+  return $sgf;
+}
+
+sub move {
+  my @chars = qw( a b c d e f g h j k l m n o p q r s t );
+  my $col = $chars[ord($_[0]) - ord('a')];
+  my $row = ord($_[1]) - ord('a');
+  return "$col$row";
+}
+
+my $sgf = readSgf($ARGV[0]);
+$sgf =~ s/;[WB]\[(\w)(\w)\]/(print move($1,$2)."\n"),""/eg;
+print "q\n";
+
