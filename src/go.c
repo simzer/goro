@@ -148,15 +148,15 @@ static int goGameOver(Go *self)
 
 static int countGoTerritory(Go *self, BoardCell cell) {
   int territory = 0;
-  GroupList groupLists = createGroupList(&(self->game.board));
-  GroupIterator iterator = createGroupIterator(&groupLists);
+  GroupList groupList = createGroupList(&(self->game.board));
+  GroupIterator iterator = createGroupIterator(&groupList);
   while(getTerritories(&iterator)) {
     if (territoryOwner(iterator.group) == cell) {
       territory += iterator.group->size;
     }
   }
-  destructGroupList(&groupLists);
-  return 0;
+  destructGroupList(&groupList);
+  return territory;
 }
 
 static PlayerId goWinner(Go *self)
@@ -164,7 +164,7 @@ static PlayerId goWinner(Go *self)
   if(goGameOver(self)) {
     return (  countGoTerritory(self, gamePlayerCells[firstPlayer])
             > countGoTerritory(self, gamePlayerCells[secondPlayer])
-              + self->komi )
+              + self->komi)
            ? firstPlayer : secondPlayer;
   } else {
     return(noPlayer);

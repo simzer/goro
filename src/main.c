@@ -142,10 +142,13 @@ static void goParametersFromCLI(Goro *self)
 {
   int index = self->cliArgument.size;
   index--;
-  while((--index) >= 0)
-    if (strcmp(self->cliArgument.item[index], "--handicap") == 0)
-  {
-    setGoHandicap(self->game, atoi(self->cliArgument.item[index+1]));
+  while((--index) >= 0) {
+    if (strcmp(self->cliArgument.item[index], "--handicap") == 0) {
+      setGoHandicap(self->game, atoi(self->cliArgument.item[index+1]));
+    }
+    if (strcmp(self->cliArgument.item[index], "--komi") == 0) {
+      ((Go *)self->game)->komi = atof(self->cliArgument.item[index+1]);
+    }
   }
 }
 
