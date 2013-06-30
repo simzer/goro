@@ -49,7 +49,7 @@ Go createGo(Board board)
 static void goMove(Go *self, BoardCoord coord)
 {
   Go *stored = copyGoGame(self);
-  destructGame(self->history[1]);
+  if(self->history[1]) destructGame(self->history[1]);
   self->history[1] = self->history[0];
   self->history[0] = stored;
   gameMove(self, coord);
@@ -72,8 +72,8 @@ static Go *copyGoGame(Go *self)
 {
   Go *copy = copyGame(self);
   copy = (Go *)realloc(copy, sizeof(Go));
-  copy->history[0] = self->history[0];
-  copy->history[1] = self->history[1];
+  copy->history[0] = self->history[0] ? copyGame(self->history[0]) : 0;
+  copy->history[1] = self->history[1] ? copyGame(self->history[1]) : 0;
   copy->komi = self->komi;
   return copy;
 }
@@ -91,6 +91,7 @@ static int validGoMove(Go *self, BoardCoord coord)
     if (repeatedGoPosition(copy)) {
       return(0);
     }
+    destructGame(copy);
   }
   return(1);
 }
@@ -100,7 +101,9 @@ static int goMoveDiedInstantly(Go *self, BoardCoord coord) {
 }
 
 static int repeatedGoPosition(Go *self) {
-  return boardEqual(self, self->history[1]);
+  return    self->history[1]
+         && boardEqual(&self->game.board,
+                       &self->history[1]->board);
 }
 
 static int goMoveWorthChecking(Go *self, BoardCoord coord)

@@ -17,7 +17,7 @@ extern void destructGroup(Group *self);
 extern int groupLiberties(Group *self);
 extern void removeGroup(Group *self);
 extern BoardCell territoryOwner(Group *self);
-
+extern void printGroup(Group *self);
 
 typedef struct Groups {
   Group *groups;
@@ -25,6 +25,7 @@ typedef struct Groups {
 } Groups;
 extern Groups createGroups(Board *board);
 extern void destructGroups(Groups *self);
+extern void printGroups(Groups *self);
 
 
 typedef struct GroupIterator {

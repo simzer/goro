@@ -67,6 +67,17 @@ void removeGroup(Group *self)
   self->cells = 0;
 }
 
+void printGroup(Group *self)
+{
+  int i;
+  printf("[");
+  for (i = 0; i < self->size; i++) {
+    BoardCoordString string = boardCoordToString(self->cells[i]);
+    printf("%s,", string.chars);
+  }
+  printf("]\n");
+}
+
 BoardCell territoryOwner(Group *self)
 {
   BoardCell owner = emptyBoardCell;
@@ -100,8 +111,7 @@ Groups createGroups(Board *board)
   {
     group.board = board;
     self.groupNumber++;
-    self.groups = realloc(self.groups,
-                          self.groupNumber * sizeof(Group));
+    self.groups = malloc(self.groupNumber * sizeof(Group));
     self.groups[self.groupNumber-1] = group;
   }
   return self;
@@ -122,12 +132,13 @@ static Group getAGroup(Board *board)
 static void collectGroup(Group *group, BoardCoord coord)
 {
   NeighbourIterator iterator;
+  BoardCell referenceCell = getBoardCell(group->board, coord);
   addCoordToGroup(group, coord);
   setBoardCell(group->board, coord, invalidBoardCell);
   iterator = createNeighbourIterator(coord,fourNeighbourhood);
   while(getNeighbours(&iterator)) {
     if(   getBoardCell(group->board, iterator.neighbour)
-       == getBoardCell(group->board, group->cells[0]) )
+       == referenceCell )
     {
       collectGroup(group, iterator.neighbour);
     }
@@ -142,6 +153,16 @@ void destructGroups(Groups *self)
   }
   free(self->groups);
   self->groups = 0;
+}
+
+void printGroups(Groups *self)
+{
+  int i;
+  for (i = 0; i < self->groupNumber; i++) {
+    printf("( group[%d] = ", i);
+    printGroup(&self->groups[i]);
+    printf(",");
+  };
 }
 
 GroupIterator createGroupIterator(Groups *groups)

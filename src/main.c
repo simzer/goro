@@ -57,7 +57,6 @@ static void destructGoro(Goro *self)
 {
   if(self->game) {
     destructGame(self->game);
-    free(self->game);
     self->game = 0;
   }
   if(self->players[0]) free(self->players[0]); self->players[0] = 0;
@@ -72,15 +71,16 @@ static void runGoro(Goro *self)
     BoardCoordString string;
     coord = self->players[self->game->actualPlayer]
                 ->getMove(self->players[self->game->actualPlayer]);
-    gameMove(self->game, coord);
+    self->game->vtable->move(self->game, coord);
   }
   printGameOverInfo(self->game);
 }
 
 static void initGoroPlayersFromCLI(Goro *self)
 {
-  int index = self->cliArgument.size-1;
-  while((index--) >= 0) {
+  int index = self->cliArgument.size;
+  index--;
+  while((--index) >= 0) {
     PlayerId playerId = playerIdFromCLIOption(self->cliArgument.item[index]);
     if(playerId != noPlayer) {
       if (strcmp(self->cliArgument.item[index+1], "ai") == 0) {
@@ -117,15 +117,14 @@ static PlayerId playerIdFromCLIOption(char *arg) {
 
 static void initGoroGameFromCLI(Goro *self)
 {
-  int index = self->cliArgument.size-1;
+  int index = self->cliArgument.size;
   self->game = 0;
-  while((index--) >= 0)
-    if (strcmp(self->cliArgument.item[index], "--game") == 0)
+  while((--index) >= 0)
   {
-    if (strcmp(self->cliArgument.item[index+1], "tictactoe") == 0) {
+    if (strcmp(self->cliArgument.item[index], "--tictactoe") == 0) {
       self->game = malloc(sizeof(TicTacToe));
       *(TicTacToe *)self->game = createTicTacToe(standardBoardSizes[nanoBoard]);
-    } else if (strcmp(self->cliArgument.item[index+1], "gomoko") == 0) {
+    } else if (strcmp(self->cliArgument.item[index], "--gomoko") == 0) {
       self->game = malloc(sizeof(Gomoko));
       *(Gomoko *)self->game = createGomoko(
           createSquareBoard(standardBoardSizes[normalBoard]));
@@ -139,8 +138,9 @@ static void initGoroGameFromCLI(Goro *self)
 
 static int boardSizeFromCLI(Goro *self)
 {
-  int index = self->cliArgument.size-1;
-  while((index--) >= 0)
+  int index = self->cliArgument.size;
+  index--;
+  while((--index) >= 0)
     if (strcmp(self->cliArgument.item[index], "--board") == 0)
   {
     return atoi(self->cliArgument.item[index+1]);

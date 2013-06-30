@@ -55,7 +55,7 @@ BoardCoord getNeighbourDirection(NeighbourIterator *self)
 int getNeighbours(NeighbourIterator *self)
 {
   self->index++;
-  if (self->index < self->neighbourhood.endIndex)
+  if (self->index <= self->neighbourhood.endIndex)
   {
     self->neighbour =
         addBoardCoords(self->center,

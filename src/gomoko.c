@@ -155,9 +155,9 @@ static void countRow(Gomoko *self, BoardLineIterator *iterator,
   while(getBoardLineCoords(iterator))
   {
     BoardCell cell = getBoardCell(&((Game *)self)->board, iterator->coord);
-    if (cell == actualGamePlayerCell(self)) {
+    if (cell == gamePlayerCells[actualGamePlayerCell(self)]) {
       (*friends)++;
-    } else if (cell == otherGamePlayer(self)) {
+    } else if (cell == gamePlayerCells[otherGamePlayer(self)]) {
       (*enemies)++;
     }
   }
