@@ -24,6 +24,7 @@ static int repeatedGoPosition(Go *self);
 static int goMoveDiedInstantly(Go *self, BoardCoord coord);
 static void removeDeadGroups(Go *self, BoardCell cell);
 static int countGoTerritory(Go *self, BoardCell cell);
+static double goScore(Go *self);
 
 static const BoardCoordString standardHandicaps[][9] =
 {
@@ -159,13 +160,17 @@ static int countGoTerritory(Go *self, BoardCell cell) {
   return territory;
 }
 
+static double goScore(Go *self)
+{
+  return   countGoTerritory(self, gamePlayerCells[firstPlayer])
+         - countGoTerritory(self, gamePlayerCells[secondPlayer])
+         - self->komi;
+}
+
 static PlayerId goWinner(Go *self)
 {
   if(goGameOver(self)) {
-    return (  countGoTerritory(self, gamePlayerCells[firstPlayer])
-            > countGoTerritory(self, gamePlayerCells[secondPlayer])
-              + self->komi)
-           ? firstPlayer : secondPlayer;
+    return (goScore(self) > 0) ? firstPlayer : secondPlayer;
   } else {
     return(noPlayer);
   }
@@ -179,7 +184,8 @@ static double evalGoPosition(Go *self)
   } else if (winner == otherGamePlayer(self)) {
     return miniMaxLoseScore;
   } else {
-    return(0);
+    return (actualGamePlayer(self) == firstPlayer ? 1 : -1)
+           * goScore(self);
   }
 }
 
