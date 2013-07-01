@@ -13,7 +13,9 @@
 #include "boardcoord.h"
 #include "boarditerator.h"
 
-const char boardSigns[] = { '.', '@', 'O'};
+static void printRowHeader(Board *self);
+
+const char boardSigns[] = { '.', 'X', 'O'};
 
 const char* boardCellNames[] = {
   "empty", "black", "white", "invalid"
@@ -100,22 +102,29 @@ void clearBoardCell(Board *self, BoardCoord coord)
   self->cells[coord.row * self->width + coord.col] = emptyBoardCell;
 }
 
-void printBoard(Board *self)
+static void printRowHeader(Board *self)
 {
-  BoardIterator iterator = createBoardIterator(self);
-  int col, row;
+  int col;
   printf("   ");
   for(col = 0; col < self->width; col++) {
     printf("%c ", boardColumnToChar(col));
   }
   printf("\n");
+}
+
+void printBoard(Board *self)
+{
+  BoardIterator iterator = createBoardIterator(self);
+  int col, row;
+  printRowHeader(self);
   for(row = self->height-1; row >= 0; row--) {
     printf("%2d ", row+1);
     for(col = 0; col < self->width; col++) {
       printf("%c ", boardSigns[getBoardCell(self, createBoardCoord(row,col))]);
     }
-    printf("\n");
+    printf("%2d\n", row+1);
   }
+  printRowHeader(self);
 }
 
 int boardHasEmptyCell(Board *self)
