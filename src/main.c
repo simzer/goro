@@ -14,6 +14,8 @@
 #include "go.h"
 #include "cliplayer.h"
 #include "minimax.h"
+#include "gtp.h"
+#include "testplayer.h"
 
 typedef struct {
   struct {
@@ -90,6 +92,12 @@ static void initGoroPlayersFromCLI(Goro *self)
       } else if (strcmp(self->cliArgument.item[index+1], "cli") == 0) {
         self->players[playerId] = malloc(sizeof(CLIPlayer));
         *(CLIPlayer *)(self->players[playerId]) = createCLIPlayer(self->game);
+      } else if (strcmp(self->cliArgument.item[index+1], "gtp") == 0) {
+        self->players[playerId] = malloc(sizeof(GTP));
+        *(GTP *)(self->players[playerId]) = createGTP(self->game);
+      } else if (strcmp(self->cliArgument.item[index+1], "test") == 0) {
+        self->players[playerId] = malloc(sizeof(TestPlayer));
+        *(TestPlayer *)(self->players[playerId]) = createTestPlayer(self->game);
       } else {
         fprintf(stderr, "Player type not recognized\n");
         exit(1);
