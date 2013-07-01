@@ -41,5 +41,7 @@ extern void saveBoard(Board *self, FILE *file);
 extern int boardHasEmptyCell(Board *self);
 extern int boardCellHasNeighbour(Board *self, BoardCoord coord,
                                  Neighbourhood neighbourhood);
+extern BoardCoord mirrorBoardCoord(Board *board, BoardCoord coord);
+extern BoardCoord boardTengen(Board *self);
 
 #endif

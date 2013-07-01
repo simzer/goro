@@ -195,3 +195,12 @@ Board loadBoard(FILE *file)
   assert(0);
   return(self);
 }
+
+BoardCoord mirrorBoardCoord(Board *self, BoardCoord coord) {
+  return createBoardCoord(self->height - 1 - coord.row,
+                          self->width - 1 - coord.col);
+}
+
+BoardCoord boardTengen(Board *self) {
+  return createBoardCoord(self->height/2, self->width/2);
+}

@@ -21,9 +21,14 @@ static BoardCoord getTestPlayerMove(TestPlayer *self)
 {
   BoardCoord coord;
   Game* game = ((Player *)self)->game;
-  do {
+  if (boardCoordsEqual(game->lastMove, nullBoardCoord)) {
+    coord = boardTengen(&self->player.game->board);
+  } else {
+    coord = mirrorBoardCoord(&self->player.game->board, game->lastMove);
+  }
+  while (!game->vtable->validMove(game, coord)) {
     coord = createBoardCoord(rand()%(game->board.height),
                              rand()%(game->board.width));
-  } while (!game->vtable->validMove(game, coord));
+  };
   return(coord);
 }
