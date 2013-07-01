@@ -14,6 +14,9 @@ typedef struct Go {
   double komi;
 } Go;
 
+#define maxStandardGoHandicaps 9
+extern const BoardCoordString standardGoHandicaps[maxStandardGoHandicaps]
+                                                 [maxStandardGoHandicaps];
 extern Go createGo(Board board);
 extern void setGoHandicap(Go *self, int handicap);
 

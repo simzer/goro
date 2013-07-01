@@ -7,9 +7,14 @@
 #include "stdio.h"
 #include "string.h"
 #include "about.h"
+#include "go.h"
 #include "gtp.h"
 
 static BoardCoord getGTPMove(GTP *self);
+static void processCommand(GTP *self, char *command, char *argument);
+static void sendLastMove(GTP *self);
+static void warning(GTP *self, char *message);
+static void response(GTP *self, char *message);
 
 static void printKnownCommands(GTP *self, char *argument);
 static void printName(GTP *self, char *argument);
@@ -47,30 +52,48 @@ GTP createGTP(Game *game)
   self.player.game = game;
   self.player.getMove = &getGTPMove;
   self.ID = 0;
+  self.moveRequested = 0;
+  self.lastSentMove = nullBoardCoord;
+  self.nextMove = nullBoardCoord;
   setvbuf(stdout, NULL, _IONBF, 0);
   return self;
+}
+
+static int lastMoveNotSent(GTP *self) {
+  return !boardCoordsEqual(self->lastSentMove,
+                           self->player.game->lastMove);
 }
 
 static BoardCoord getGTPMove(GTP *self)
 {
   BoardCoord coord;
-  //todo
-  /*
-  (?:\d+\s+)*(\w+)(.*)/i;
-  my ($command, $args) = ($1, $2);
-  */
-  return(coord);
+  char line[1024];
+  char command[64];
+  char argument[1024];
+  if(self->moveRequested && lastMoveNotSent(self)) sendLastMove(self);
+  // todo: can be a number at the begining, not handled!
+  while(scanf("%[^\n]%*c",line)>0) {
+    sscanf(line, "%s %[^\n]%*c",command, argument);
+    processCommand(self, command, argument);
+    if(self->moveRequested) {
+      if(lastMoveNotSent(self)) sendLastMove(self); else break;
+    }
+  }
+  return(self->nextMove);
 }
 
-static void warning(GTP *self, char *message) {
-  printf("%c %s\n\n", GTPWarningCode, message);
+static void sendLastMove(GTP *self) {
+  if(!boardCoordsEqual(self->player.game->lastMove, nullBoardCoord)) {
+    BoardCoordString lastMove =
+      boardCoordToString(self->player.game->lastMove);
+    response(self, lastMove.chars);
+    self->lastSentMove = self->player.game->lastMove;
+    self->moveRequested = 0;
+  }
 }
 
-static void response(GTP *self, char *message) {
-  printf("%c %s\n\n", GTPResponseCode, message);
-}
-
-static void processCommand(GTP *self, char *command, char *argument) {
+static void processCommand(GTP *self, char *command, char *argument)
+{
   int i;
   for(i = 0;
       i < sizeof(GTPCommandTable)/sizeof(GTPCommandTable[0]);
@@ -84,6 +107,14 @@ static void processCommand(GTP *self, char *command, char *argument) {
   warning(self, "unknown command: $command");
 }
 
+static void warning(GTP *self, char *message) {
+  printf("%c %s\n\n", GTPWarningCode, message);
+}
+
+static void response(GTP *self, char *message) {
+  printf("%c %s\n\n", GTPResponseCode, message);
+}
+
 static void printKnownCommands(GTP *self, char *argument) {
   int i;
   char *list = malloc(1);
@@ -93,8 +124,8 @@ static void printKnownCommands(GTP *self, char *argument) {
       i++)
   {
     list = realloc(list,   strlen(list)
-                         + strlen(GTPCommandTable[i].command) + 1);
-    strcat(list, strlen(GTPCommandTable[i].command));
+                         + strlen(GTPCommandTable[i].command) + 2);
+    strcat(list, GTPCommandTable[i].command);
     strcat(list, "\n");
   }
   response(self, list);
@@ -138,10 +169,9 @@ static void play(GTP *self, char *argument) {
   } else if(strcmp(move, "pass") == 0) {
     // todo
   } else {
-    BoardCoord coord;
     BoardCoordString string;
     strcpy(string.chars, move);
-    coord = stringToBoardCoord(string);
+    self->nextMove = stringToBoardCoord(string);
   }
   response(self, "");
   return;
@@ -150,30 +180,35 @@ error:
 }
 
 static void placeFreeHandicap(GTP *self, char *argument) {
-/*
-      if($args =~ /\s*(\d+)\s* /i) {
-        $handicap = $1;
-        @handicaps = qw(k10 d16 q4 d4 q16 d10 q10 k16 k4);
-        for(@handicaps[0..($handicap-1)]) {
-          my ($col,$row) = processMove($move);
-          $table->[$col][$row] = 1;
-        }
-        response($id,join(" ",@handicaps[0..($handicap-1)]));
-      } else { warning($id,"boardsize not recognized."); }
-*/
+  int handicap, i;
+  char message[40];
+  scanf("%d", &handicap);
+  setGoHandicap((Go *)(self->player.game), handicap);
+  BoardCoordString *s = standardGoHandicaps[handicap-1];
+  sprintf(message, "%s %s %s %s %s %s %s %s %s",
+          s[0].chars, s[1].chars, s[2].chars,
+          s[3].chars, s[4].chars, s[5].chars,
+          s[6].chars, s[7].chars, s[8].chars);
+  response(self, message);
 }
 
 static void setFreeHandicap(GTP *self, char *argument) {
-/*      while($args =~ s/(\w\d+)//i) {
-        $move = $1;
-        ($col,$row) = processMove($move);
-        $table->[$col][$row] = -1;
-      }
-*/
+  int i;
+  BoardCoordString s[9];
+  int handicap = scanf("%s %s %s %s %s %s %s %s %s", argument,
+                      s[0].chars, s[1].chars, s[2].chars,
+                      s[3].chars, s[4].chars, s[5].chars,
+                      s[6].chars, s[7].chars, s[8].chars);
+  for(i = 0; i <  handicap; i++) {
+    setBoardCell(&self->player.game->board,
+                 stringToBoardCoord(s[i]),
+                 blackBoardCell);
+    self->player.game->actualPlayer = secondPlayer;
+  }
   response(self, "");
 }
 
 static void generateMove(GTP *self, char *argument) {
-  // todo
-  response(self,"pass");
+  self->moveRequested = 1;
+  return;
 }

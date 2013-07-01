@@ -11,6 +11,9 @@
 typedef struct GTP {
   Player player;
   int ID;
+  BoardCoord nextMove;
+  int moveRequested;
+  BoardCoord lastSentMove;
 } GTP;
 
 extern GTP createGTP(Game *game);

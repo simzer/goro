@@ -30,6 +30,7 @@ Game createGame(Board board)
   Game self;
   self.actualPlayer = firstPlayer;
   self.board = board;
+  self.lastMove = nullBoardCoord;
   return self;
 }
 
@@ -49,6 +50,7 @@ void destructGame(Game *self)
 
 void gameMove(Game *self, BoardCoord coord)
 {
+  self->lastMove = coord;
   setBoardCell(&self->board, coord, actualGamePlayerCell(self));
   switchGamePlayer(self);
 }

@@ -31,6 +31,7 @@ typedef struct GameVirtualTable {
 struct Game {
   PlayerId actualPlayer;
   Board board;
+  BoardCoord lastMove;
   const GameVirtualTable *vtable;
 };
 

@@ -26,9 +26,11 @@ static void removeDeadGroups(Go *self, BoardCell cell);
 static int countGoTerritory(Go *self, BoardCell cell);
 static double goScore(Go *self);
 
-static const BoardCoordString standardHandicaps[][9] =
+const BoardCoordString standardGoHandicaps[maxStandardGoHandicaps]
+                                          [maxStandardGoHandicaps] =
 {
-  {{"D4"}, {"Q16"}, {""}, },
+  {},
+  {{"D4"}, {"Q16"}},
   {{"D4"}, {"Q16"}, {"D16"}},
   {{"D4"}, {"Q16"}, {"D16"}, {"Q4"}},
   {{"D4"}, {"Q16"}, {"D16"}, {"Q4"}, {"K10"}},
@@ -50,10 +52,10 @@ static const GameVirtualTable goVirtualtable = {
 
 void setGoHandicap(Go *self, int handicap) {
   int i;
-  assert(handicap >=2 && handicap <= 9);
+  assert(handicap >= 2 && handicap <= maxStandardGoHandicaps);
   for(i = 0; i < handicap; i++) {
     setBoardCell(&self->game.board,
-                 stringToBoardCoord(standardHandicaps[handicap-2][i]),
+                 stringToBoardCoord(standardGoHandicaps[handicap-1][i]),
                  gamePlayerCells[firstPlayer]);
   }
   self->game.actualPlayer = secondPlayer;
