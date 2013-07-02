@@ -30,7 +30,8 @@ Game createGame(Board board)
   Game self;
   self.actualPlayer = firstPlayer;
   self.board = board;
-  self.lastMove = nullBoardCoord;
+  self.lastMove = nullMove;
+  self.winner = noPlayer;
   return self;
 }
 
@@ -48,10 +49,14 @@ void destructGame(Game *self)
   free(self);
 }
 
-void gameMove(Game *self, BoardCoord coord)
+void genericGameMove(Game *self, GameMove move)
 {
-  self->lastMove = coord;
-  setBoardCell(&self->board, coord, actualGamePlayerCell(self));
+  self->lastMove = move;
+  if(move.type == playMove) {
+    setBoardCell(&self->board, move.coord, actualGamePlayerCell(self));
+  } else if(move.type == resignMove) {
+    self->winner = otherGamePlayer(self);
+  }
   switchGamePlayer(self);
 }
 
@@ -72,33 +77,46 @@ PlayerId otherGamePlayer(Game *self)
          : firstPlayer;
 }
 
-int nextValidGameMove(Game *self, BoardIterator *iterator)
+int genericGameOver(Game *self)
+{
+  return self->winner != noPlayer
+         || !boardHasEmptyCell(&self->board);
+}
+
+int validGameMove(Game *self, GameMove move)
+{
+  return    move.type == resignMove
+         || move.type == passMove
+         || getBoardCell(&(self->board), move.coord) == emptyBoardCell;
+}
+
+int nextValidGameMove(Game *self, MoveIterator *iterator)
 {
   int result;
   do {
-    result = !boardIteratorFinished(iterator);
+    result = !moveIteratorFinished(iterator);
   } while(   (result == 1)
-          && !self->vtable->validMove(self, iterator->coord));
+          && !self->vtable->validMove(self, iterator->move));
   return result;
 }
 
-int nextMoveWorthChecking(Game *self, BoardIterator *iterator)
+int nextMoveWorthChecking(Game *self, MoveIterator *iterator)
 {
   int result;
   do {
     result = nextValidGameMove(self,iterator);
   } while(   (result == 1)
           && (self->vtable->moveWorthChecking != 0)
-          && !self->vtable->moveWorthChecking(self, iterator->coord));
+          && !self->vtable->moveWorthChecking(self, iterator->move));
   return result;
 }
 
 void printGameStatus(Game *self)
 {
   printBoard(&self->board);
-  if(!boardCoordsEqual(self->lastMove, nullBoardCoord)) {
-    BoardCoordString coord = boardCoordToString(self->lastMove);
-    printf("\nLast move: %s\n\n", coord.chars);
+  if(self->lastMove.type != invalidMove) {
+    GameMoveString move = gameMoveToString(self->lastMove);
+    printf("\nLast move: %s\n\n", move.chars);
   }
 }
 

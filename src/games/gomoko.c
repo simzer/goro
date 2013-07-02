@@ -17,16 +17,15 @@ static void countRowsInAllDirection(Gomoko *self, BoardCoord coord,
 static void countRow(Gomoko *self, BoardLineIterator *iterator,
                      int *friends, int *enemies);
 
-static int gomokoMoveWorthChecking(Gomoko *self, BoardCoord coord);
-static int validGomokoMove(Gomoko *self, BoardCoord coord);
+static int gomokoMoveWorthChecking(Gomoko *self, GameMove move);
 static int gomokoGameOver(Gomoko *self);
 static PlayerId gomokoWinner(Gomoko *self);
 static double evalGomokoPosition(Gomoko *self);
 static Gomoko *copyGomokoGame(Gomoko *self);
 
 static const GameVirtualTable gomokoVirtualtable = {
-  &gameMove,
-  &validGomokoMove,
+  &genericGameMove,
+  &validGameMove,
   &gomokoMoveWorthChecking,
   &gomokoGameOver,
   &gomokoWinner,
@@ -45,20 +44,16 @@ Gomoko createGomoko(Board board)
   return self;
 }
 
-static int gomokoMoveWorthChecking(Gomoko *self, BoardCoord coord)
+static int gomokoMoveWorthChecking(Gomoko *self, GameMove move)
 {
-  return boardCellHasNeighbour(&((Game *)self)->board, coord,
-                               eightNeighbourhood);
-}
-
-static int validGomokoMove(Gomoko *self, BoardCoord coord)
-{
-  return getBoardCell(&(((Game *)self)->board), coord) == emptyBoardCell;
+  return move.type == playMove
+         && boardCellHasNeighbour(&((Game *)self)->board, move.coord,
+                                  eightNeighbourhood);
 }
 
 static int gomokoGameOver(Gomoko *self)
 {
-  return    !boardHasEmptyCell(&((Game *)self)->board)
+  return    gameOver(self)
          || (gomokoWinner(self) != noPlayer);
 }
 
@@ -72,7 +67,8 @@ static Gomoko *copyGomokoGame(Gomoko *self)
 
 static PlayerId gomokoWinner(Gomoko *self)
 {
-  PlayerId player;
+  if(self->game.winner != noPlayer) return self->game.winner;
+
   BoardIterator iterator = createBoardIterator(&((Game *)self)->board);
   int friendCounters[self->winnerRowSize];
   int enemyCounters[self->winnerRowSize];

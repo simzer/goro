@@ -9,10 +9,10 @@
 #include "boarditerator.h"
 #include "minimax.h"
 
-static BoardCoord getMiniMaxMove(MiniMax *self);
+static GameMove getMiniMaxMove(MiniMax *self);
 
 static double searchMaxScore(const MiniMax *self,
-                             BoardCoord *coord,
+                             GameMove *bestMove,
                              Game *game,
                              int lookahead);
 
@@ -28,7 +28,7 @@ MiniMax createMiniMax(Game *game) {
 }
 
 static double searchMaxScore(const MiniMax *self,
-                             BoardCoord *bestMove,
+                             GameMove *bestMove,
                              Game *game,
                              int lookahead)
 {
@@ -38,20 +38,20 @@ static double searchMaxScore(const MiniMax *self,
   {
     double score;
     double maxScore = -INFINITY;
-    BoardCoord maxScoredCoord = *bestMove;
-    BoardIterator iterator = createBoardIterator(&game->board);
+    GameMove maxScoredMove = *bestMove;
+    MoveIterator iterator = createMoveIterator(&game->board);
     while(nextMoveWorthChecking(game, &iterator)) {
-      BoardCoord ignoredCoord;
+      GameMove ignoredMove;
       Game *nextGame = game->vtable->copy(game);
-      nextGame->vtable->move(nextGame, iterator.coord);
-      score = - searchMaxScore(self, &ignoredCoord, nextGame, lookahead-1);
+      nextGame->vtable->move(nextGame, iterator.move);
+      score = - searchMaxScore(self, &ignoredMove, nextGame, lookahead-1);
       destructGame(nextGame);
       if (score >= maxScore) {
         maxScore = score;
-        maxScoredCoord = iterator.coord;
+        maxScoredMove = iterator.move;
       }
     }
-    *bestMove = maxScoredCoord;
+    *bestMove = maxScoredMove;
     result = maxScore;
   } else {
     result = game->vtable->evalPosition(game);
@@ -61,10 +61,10 @@ static double searchMaxScore(const MiniMax *self,
 
 static BoardCoord getMiniMaxMove(MiniMax *self)
 {
-  BoardIterator iterator = createBoardIterator(&(((Player *)self)->game->board));
-  BoardCoord coord;
+  MoveIterator iterator = createMoveIterator(&(((Player *)self)->game->board));
+  GameMove move;
   nextValidGameMove(((Player *)self)->game, &iterator);
-  coord = iterator.coord;
-  searchMaxScore(self, &coord, ((Player *)self)->game, self->lookahead);
-  return(coord);
+  move = iterator.move;
+  searchMaxScore(self, &move, ((Player *)self)->game, self->lookahead);
+  return(move);
 }

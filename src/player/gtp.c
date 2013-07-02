@@ -10,7 +10,7 @@
 #include "go.h"
 #include "gtp.h"
 
-static BoardCoord getGTPMove(GTP *self);
+static GameMove getGTPMove(GTP *self);
 static void processCommand(GTP *self, char *command, char *argument);
 static void sendLastMove(GTP *self);
 static void warning(GTP *self, char *message);
@@ -53,20 +53,19 @@ GTP createGTP(Game *game)
   self.player.getMove = &getGTPMove;
   self.ID = 0;
   self.moveRequested = 0;
-  self.lastSentMove = nullBoardCoord;
-  self.nextMove = nullBoardCoord;
+  self.lastSentMove = nullMove;
+  self.nextMove = nullMove;
   setvbuf(stdout, NULL, _IONBF, 0);
   return self;
 }
 
 static int lastMoveNotSent(GTP *self) {
-  return !boardCoordsEqual(self->lastSentMove,
-                           self->player.game->lastMove);
+  return !gameMoveEqual(self->lastSentMove,
+                        self->player.game->lastMove);
 }
 
-static BoardCoord getGTPMove(GTP *self)
+static GameMove getGTPMove(GTP *self)
 {
-  BoardCoord coord;
   char line[1024];
   char command[64];
   char argument[1024];
@@ -83,9 +82,9 @@ static BoardCoord getGTPMove(GTP *self)
 }
 
 static void sendLastMove(GTP *self) {
-  if(!boardCoordsEqual(self->player.game->lastMove, nullBoardCoord)) {
-    BoardCoordString lastMove =
-      boardCoordToString(self->player.game->lastMove);
+  if(self->player.game->lastMove != invalidMove) {
+    GameMoveString lastMove =
+      gameMoveToString(self->player.game->lastMove);
     response(self, lastMove.chars);
     self->lastSentMove = self->player.game->lastMove;
     self->moveRequested = 0;
@@ -165,13 +164,13 @@ static void play(GTP *self, char *argument) {
   if(sscanf(argument, "%*s %6s", move) != 1) {
     goto error;
   } else if(strcmp(move, "resign") == 0) {
-    // todo
+    self->nextMove = createResignMove();
   } else if(strcmp(move, "pass") == 0) {
-    // todo
+    self->nextMove = createPassMove();
   } else {
-    BoardCoordString string;
+    GameMoveString string;
     strcpy(string.chars, move);
-    self->nextMove = stringToBoardCoord(string);
+    self->nextMove = stringToGameMove(string);
   }
   response(self, "");
   return;

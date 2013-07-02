@@ -3,19 +3,12 @@
 
    Copyright (C) 2013 Goro Team <https://github.com/goro-dev?tab=members> */
 
-#ifndef __GTP_H__
-#define __GTP_H__
+#ifndef __TICTACTOE_H__
+#define __TICTACTOE_H__
 
-#include "player.h"
+#include "game.h"
 
-typedef struct GTP {
-  Player player;
-  int ID;
-  GameMove nextMove;
-  int moveRequested;
-  GameMove lastSentMove;
-} GTP;
-
-extern GTP createGTP(Game *game);
+typedef Game TicTacToe;
+extern TicTacToe createTicTacToe(BoardSize size);
 
 #endif

@@ -7,7 +7,7 @@
 #include  "string.h"
 #include  "cliplayer.h"
 
-static BoardCoord getCLIPlayerMove(CLIPlayer *self);
+static GameMove getCLIPlayerMove(CLIPlayer *self);
 
 CLIPlayer createCLIPlayer(Game *game)
 {
@@ -17,10 +17,10 @@ CLIPlayer createCLIPlayer(Game *game)
   return self;
 }
 
-static BoardCoord getCLIPlayerMove(CLIPlayer *self)
+static GameMove getCLIPlayerMove(CLIPlayer *self)
 {
-  BoardCoord coord;
-  BoardCoordString string;
+  GameMove move;
+  GameMoveString string;
   int  rowIndex;
   Game* game = ((Player *)self)->game;
   game->vtable->printGameStatus(game);
@@ -28,8 +28,8 @@ static BoardCoord getCLIPlayerMove(CLIPlayer *self)
     printf("Player %d step: ", game->actualPlayer);
     scanf("%3s", string.chars);
     if (strcmp(string.chars,"q") == 0) exit(0); //todo: exit properly
-    coord = stringToBoardCoord(string);
-  } while (!game->vtable->validMove(game, coord)
+    move = stringToGameMove(string);
+  } while (!game->vtable->validMove(game, move)
            && (printf("Invalid move.\n"),1) );
-  return(coord);
+  return(move);
 }

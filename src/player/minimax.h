@@ -16,6 +16,6 @@ typedef struct MiniMax {
 extern const double miniMaxWinScore;
 extern const double miniMaxLoseScore;
 
-extern MiniMax createMiniMax(Game *game);
+extern GameMove createMiniMax(Game *game);
 
 #endif

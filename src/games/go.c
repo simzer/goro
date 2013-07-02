@@ -13,13 +13,13 @@
 #include "boarditerator.h"
 #include "group.h"
 
-static int goMoveWorthChecking(Go *self, BoardCoord coord);
-static int validGoMove(Go *self, BoardCoord coord);
+static int goMoveWorthChecking(Go *self, GameMove move);
+static int validGoMove(Go *self, GameMove move);
 static int goGameOver(Go *self);
 static PlayerId goWinner(Go *self);
 static double evalGoPosition(Go *self);
 static Go *copyGoGame(Go *self);
-static void goMove(Go *self, BoardCoord coord);
+static void goMove(Go *self, GameMove move);
 static int repeatedGoPosition(Go *self);
 static int goMoveDiedInstantly(Go *self, BoardCoord coord);
 static int removeDeadGroups(Go *self, BoardCell cell);
@@ -77,17 +77,21 @@ Go createGo(Board board)
   return self;
 }
 
-static void goMove(Go *self, BoardCoord coord)
+static void goMove(Go *self, GameMove move)
 {
-  Go *stored = copyGoGame(self);
-  if(self->history[1]) destructGame(self->history[1]);
-  self->history[1] = self->history[0];
-  self->history[0] = stored;
-  gameMove(self, coord);
-  self->captures[otherGamePlayer(self)] +=
-    removeDeadGroups(self, gamePlayerCells[actualGamePlayer(self)]);
-  self->captures[actualGamePlayer(self)] +=
-    removeDeadGroups(self, gamePlayerCells[otherGamePlayer(self)]);
+  if (move.type == passMove && self->game.lastMove.type == passMove) {
+    self->game.winner = goWinner(self); // implement a game finished flag instead
+  } else {
+    Go *stored = copyGoGame(self);
+    if(self->history[1]) destructGame(self->history[1]);
+    self->history[1] = self->history[0];
+    self->history[0] = stored;
+    genericGameMove(self, move);
+    self->captures[otherGamePlayer(self)] +=
+      removeDeadGroups(self, gamePlayerCells[actualGamePlayer(self)]);
+    self->captures[actualGamePlayer(self)] +=
+      removeDeadGroups(self, gamePlayerCells[otherGamePlayer(self)]);
+  }
 }
 
 static int removeDeadGroups(Go *self, BoardCell cell) {
@@ -116,18 +120,16 @@ static Go *copyGoGame(Go *self)
   return copy;
 }
 
-static int validGoMove(Go *self, BoardCoord coord)
+static int validGoMove(Go *self, GameMove move)
 {
-  if (getBoardCell(&self->game.board, coord) != emptyBoardCell) {
+  if (!validGameMove(self, move)) {
     return(0);
   } else {
     Go *copy = copyGoGame(self);
-    goMove(copy, coord);
-    if (goMoveDiedInstantly(copy, coord)) {
-      return(0);
-    }
-    if (repeatedGoPosition(copy)) {
-      return(0);
+    goMove(copy, move);
+    if(move.type == playMove) {
+      if (goMoveDiedInstantly(copy, move.coord)) return(0);
+      if (repeatedGoPosition(copy)) return(0);
     }
     destructGame(copy);
   }
@@ -144,21 +146,23 @@ static int repeatedGoPosition(Go *self) {
                        &self->history[1]->board);
 }
 
-static int goMoveWorthChecking(Go *self, BoardCoord coord)
+static int goMoveWorthChecking(Go *self, GameMove move)
 {
-  return 1;
+  return move.type != resignMove;
 }
 
 static int goGameOver(Go *self)
 {
-  int gameOver = 1;
-  BoardIterator iterator = createBoardIterator(&(self->game.board));
-  while(!boardIteratorFinished(&iterator)) {
-    if(validGoMove(self, iterator.coord)) {
-      gameOver = 0;
+  if(genericGameOver(self))
+    return 1;
+  else {
+    int gameOver = 1;
+    MoveIterator iterator = createMoveIterator(&(self->game.board));
+    while(!moveIteratorFinished(&iterator)) {
+      if(validGoMove(self, iterator.move)) gameOver = 0;
     }
+    return gameOver;
   }
-  return gameOver;
 }
 
 static int countGoTerritory(Go *self, BoardCell cell) {

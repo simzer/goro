@@ -13,7 +13,7 @@ typedef struct Player Player;
 
 struct Player {
   Game *game;
-  BoardCoord (*getMove)(Player *self);
+  GameMove (*getMove)(Player *self);
 };
 
 #endif

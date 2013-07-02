@@ -7,7 +7,7 @@
 #include  "string.h"
 #include  "testplayer.h"
 
-static BoardCoord getTestPlayerMove(TestPlayer *self);
+static GameMove getTestPlayerMove(TestPlayer *self);
 
 TestPlayer createTestPlayer(Game *game)
 {
@@ -17,18 +17,21 @@ TestPlayer createTestPlayer(Game *game)
   return self;
 }
 
-static BoardCoord getTestPlayerMove(TestPlayer *self)
+static GameMove getTestPlayerMove(TestPlayer *self)
 {
-  BoardCoord coord;
+  GameMove move;
   Game* game = ((Player *)self)->game;
-  if (boardCoordsEqual(game->lastMove, nullBoardCoord)) {
-    coord = boardTengen(&self->player.game->board);
+  if (game->lastMove.type == invalidMove) {
+    move = createPlayMove(boardTengen(&self->player.game->board));
+  } else if (game->lastMove.type == passMove) {
+    move = createPassMove();
   } else {
-    coord = mirrorBoardCoord(&self->player.game->board, game->lastMove);
+    move = createPlayMove(
+             mirrorBoardCoord(&self->player.game->board, game->lastMove.coord));
   }
-  while (!game->vtable->validMove(game, coord)) {
-    coord = createBoardCoord(rand()%(game->board.height),
-                             rand()%(game->board.width));
+  while (!game->vtable->validMove(game, move)) {
+    move = createPlayMove(createBoardCoord(rand()%(game->board.height),
+                                           rand()%(game->board.width)));
   };
-  return(coord);
+  return(move);
 }
