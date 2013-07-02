@@ -82,7 +82,7 @@ static GameMove getGTPMove(GTP *self)
 }
 
 static void sendLastMove(GTP *self) {
-  if(self->player.game->lastMove != invalidMove) {
+  if(self->player.game->lastMove.type != invalidMove) {
     GameMoveString lastMove =
       gameMoveToString(self->player.game->lastMove);
     response(self, lastMove.chars);

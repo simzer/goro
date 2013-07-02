@@ -8,7 +8,7 @@
 
 #include "gamemove.h"
 
-const GameMove nullMove = { nullBoardCoord, invalidMove };
+const GameMove nullMove = { { -1, -1 }, invalidMove };
 
 GameMove createGameMove(BoardCoord coord, GameMoveType type)
 {
@@ -43,14 +43,14 @@ GameMove createPlayMove(BoardCoord coord)
   return self;
 }
 
-GameMove stringToGameMove(char *string) {
+GameMove stringToGameMove(GameMoveString string) {
   GameMove self;
-  self.coord = stringToBoardCoord(string);
+  self.coord = stringToBoardCoord(createBoardCoordString(string.chars));
   if (!boardCoordsEqual(self.coord, nullBoardCoord)) {
     self.type = playMove;
   } else {
-    if (strcmp(string, "pass") == 0) self.type = passMove;
-    else if (strcmp(string, "res") == 0) self.type = resignMove;
+    if (strcmp(string.chars, "pass") == 0) self.type = passMove;
+    else if (strcmp(string.chars, "res") == 0) self.type = resignMove;
     else self.type = invalidMove;
   }
   return self;
@@ -63,8 +63,9 @@ GameMoveString createGameMoveString(char *string) {
 }
 
 GameMoveString gameMoveToString(GameMove move) {
+  BoardCoordString string = boardCoordToString(move.coord);
   switch(move.type) {
-    case playMove: return stringToBoardCoord(move.coord);
+    case playMove: return createGameMoveString(string.chars);
     case resignMove: return createGameMoveString("res");
     case passMove: return createGameMoveString("pass");
     default: return createGameMoveString("null");

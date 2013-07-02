@@ -76,6 +76,12 @@ BoardCoord addBoardCoords(BoardCoord self, BoardCoord add) {
   return coord;
 }
 
+BoardCoordString createBoardCoordString(char *string) {
+  BoardCoordString self;
+  snprintf(self.chars, sizeof(self.chars), "%s", string);
+  return self;
+}
+
 BoardCoord stringToBoardCoord(BoardCoordString string)
 {
   BoardCoord coord;
@@ -94,9 +100,10 @@ BoardCoord stringToBoardCoord(BoardCoordString string)
 BoardCoordString boardCoordToString(BoardCoord coord)
 {
   BoardCoordString string;
-  int charsWritten =
-    snprintf(string.chars, sizeof(string.chars), "%c%d",
-             boardColumnCharacters[coord.col], coord.row+1);
+  int charsWritten = (boardCoordsEqual(coord, nullBoardCoord))
+      ? snprintf(string.chars, sizeof(string.chars), "nan")
+      : snprintf(string.chars, sizeof(string.chars), "%c%d",
+                 boardColumnCharacters[coord.col], coord.row+1);
   assert(charsWritten < sizeof(string.chars));
   string.chars[sizeof(string.chars)-1] = '\0';
   return string;

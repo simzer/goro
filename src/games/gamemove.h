@@ -25,7 +25,6 @@ extern GameMove createGameMove(BoardCoord coord, GameMoveType type);
 extern GameMove createPlayMove(BoardCoord coord);
 extern GameMove createResignMove();
 extern GameMove createPassMove();
-extern GameMove stringToGameMove(char *string);
 extern int gameMoveEqual(GameMove self, GameMove res);
 
 typedef struct GameMoveString {
@@ -33,6 +32,7 @@ typedef struct GameMoveString {
 } GameMoveString;
 extern GameMoveString gameMoveToString(GameMove move);
 extern GameMoveString createGameMoveString(char *string);
+extern GameMove stringToGameMove(GameMoveString string);
 
 typedef struct MoveIterator {
   BoardIterator boardIterator;

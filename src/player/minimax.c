@@ -59,7 +59,7 @@ static double searchMaxScore(const MiniMax *self,
   return result;
 }
 
-static BoardCoord getMiniMaxMove(MiniMax *self)
+static GameMove getMiniMaxMove(MiniMax *self)
 {
   MoveIterator iterator = createMoveIterator(&(((Player *)self)->game->board));
   GameMove move;

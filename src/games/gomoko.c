@@ -53,7 +53,7 @@ static int gomokoMoveWorthChecking(Gomoko *self, GameMove move)
 
 static int gomokoGameOver(Gomoko *self)
 {
-  return    gameOver(self)
+  return    genericGameOver(self)
          || (gomokoWinner(self) != noPlayer);
 }
 

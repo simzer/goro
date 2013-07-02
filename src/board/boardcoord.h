@@ -11,6 +11,7 @@
 typedef struct BoardCoordString {
   char chars[4];
 } BoardCoordString;
+extern BoardCoordString createBoardCoordString(char *string);
 
 typedef enum {
   nanoBoard,
