@@ -16,12 +16,11 @@
 #include "minimax.h"
 #include "gtp.h"
 #include "testplayer.h"
+#include "about.h"
+#include "options.h"
 
 typedef struct {
-  struct {
-  int size;
-  char **item;
-  } cliArgument;
+  CliOptionParser options;
   Game *game;
   Player *players[2];
 } Goro;
@@ -32,8 +31,9 @@ static void initGoroGameFromCLI(Goro *self);
 static void initGoroPlayersFromCLI(Goro *self);
 static void setDefaultNotInitializedPlayers(Goro *self);
 static void goParametersFromCLI(Goro *self);
-static PlayerId playerIdFromCLIOption(char *arg);
 static int boardSizeFromCLI(Goro *self);
+static void printHelp(void);
+static Player *createPlayerByName(Goro *self, char *type);
 
 int main(int argc, char *argv[])
 {
@@ -46,8 +46,11 @@ int main(int argc, char *argv[])
 static Goro createGoro(int argc, char *argv[])
 {
   Goro self;
-  self.cliArgument.size = argc;
-  self.cliArgument.item = argv;
+  self.options = createCliOptionParser(argc, argv);
+  if(cliOptionSet(&self.options, "--help")) {
+    printHelp();
+    exit(0);
+  }
   initGoroGameFromCLI(&self);
   self.players[0] = 0;
   self.players[1] = 0;
@@ -70,40 +73,52 @@ static void runGoro(Goro *self)
 {
   while(!self->game->vtable->over(self->game))
   {
-    BoardCoord coord;
-    BoardCoordString string;
-    coord = self->players[self->game->actualPlayer]
+    GameMove move;
+    move = self->players[self->game->actualPlayer]
                 ->getMove(self->players[self->game->actualPlayer]);
-    self->game->vtable->move(self->game, coord);
+    self->game->vtable->move(self->game, move);
   }
   printGameOverInfo(self->game);
 }
 
 static void initGoroPlayersFromCLI(Goro *self)
 {
-  int index = self->cliArgument.size;
-  index--;
-  while((--index) >= 0) {
-    PlayerId playerId = playerIdFromCLIOption(self->cliArgument.item[index]);
-    if(playerId != noPlayer) {
-      if (strcmp(self->cliArgument.item[index+1], "ai") == 0) {
-        self->players[playerId] = malloc(sizeof(MiniMax));
-        *(MiniMax *)(self->players[playerId]) = createMiniMax(self->game);
-      } else if (strcmp(self->cliArgument.item[index+1], "cli") == 0) {
-        self->players[playerId] = malloc(sizeof(CLIPlayer));
-        *(CLIPlayer *)(self->players[playerId]) = createCLIPlayer(self->game);
-      } else if (strcmp(self->cliArgument.item[index+1], "gtp") == 0) {
-        self->players[playerId] = malloc(sizeof(GTP));
-        *(GTP *)(self->players[playerId]) = createGTP(self->game);
-      } else if (strcmp(self->cliArgument.item[index+1], "test") == 0) {
-        self->players[playerId] = malloc(sizeof(TestPlayer));
-        *(TestPlayer *)(self->players[playerId]) = createTestPlayer(self->game);
-      } else {
-        fprintf(stderr, "Player type not recognized\n");
-        exit(1);
-      }
+  PlayerId player;
+  char *playerCliOption[] = { "--black", "--white" };
+  for(player = firstPlayer; player == secondPlayer; player++) {
+    if(cliOptionSet(&self->options, playerCliOption[player])) {
+      self->players[firstPlayer] =
+          createPlayerByName(self,
+                             getCliOptionValue(&self->options,
+                                               playerCliOption[player]));
     }
   }
+}
+
+static Player *createPlayerByName(Goro *self, char *type)
+{
+  Player *player;
+  if (strcmp(type, "ai") == 0) {
+    player = malloc(sizeof(MiniMax));
+    *(MiniMax *)player = createMiniMax(self->game);
+  }
+  else if (strcmp(type, "cli") == 0)  {
+    player  = malloc(sizeof(CLIPlayer));
+    *(CLIPlayer *)player  = createCLIPlayer(self->game);
+  }
+  else if (strcmp(type, "gtp") == 0) {
+    player  = malloc(sizeof(GTP));
+    *(GTP *)player  = createGTP(self->game);
+  }
+  else if (strcmp(type, "test") == 0) {
+    player  = malloc(sizeof(TestPlayer));
+    *(TestPlayer *)player = createTestPlayer(self->game);
+  }
+  else {
+    fprintf(stderr, "Player type not recognized\n");
+    exit(1);
+  }
+  return player;
 }
 
 static void setDefaultNotInitializedPlayers(Goro *self)
@@ -118,28 +133,17 @@ static void setDefaultNotInitializedPlayers(Goro *self)
   }
 }
 
-static PlayerId playerIdFromCLIOption(char *arg) {
-  if (strcmp(arg, "--black") == 0) return firstPlayer;
-  if (strcmp(arg, "--white") == 0) return secondPlayer;
-  return noPlayer;
-}
-
 static void initGoroGameFromCLI(Goro *self)
 {
-  int index = self->cliArgument.size;
-  self->game = 0;
-  while((--index) >= 0)
-  {
-    if (strcmp(self->cliArgument.item[index], "--tictactoe") == 0) {
-      self->game = malloc(sizeof(TicTacToe));
-      *(TicTacToe *)self->game = createTicTacToe(standardBoardSizes[nanoBoard]);
-    } else if (strcmp(self->cliArgument.item[index], "--gomoko") == 0) {
-      self->game = malloc(sizeof(Gomoko));
-      *(Gomoko *)self->game = createGomoko(
-          createSquareBoard(standardBoardSizes[normalBoard]));
-    }
-  }
-  if(self->game == 0) {
+  if(cliOptionSet(&self->options, "--tictactoe")) {
+    self->game = malloc(sizeof(TicTacToe));
+    *(TicTacToe *)self->game = createTicTacToe(standardBoardSizes[nanoBoard]);
+  } else
+  if(cliOptionSet(&self->options, "--gomoko")) {
+    self->game = malloc(sizeof(Gomoko));
+    *(Gomoko *)self->game = createGomoko(
+        createSquareBoard(standardBoardSizes[normalBoard]));
+  } else {
     self->game = malloc(sizeof(Go));
     *(Go *)self->game = createGo(createSquareBoard(boardSizeFromCLI(self)));
     goParametersFromCLI(self);
@@ -148,27 +152,28 @@ static void initGoroGameFromCLI(Goro *self)
 
 static void goParametersFromCLI(Goro *self)
 {
-  int index = self->cliArgument.size;
-  index--;
-  while((--index) >= 0) {
-    if (strcmp(self->cliArgument.item[index], "--handicap") == 0) {
-      setGoHandicap(self->game, atoi(self->cliArgument.item[index+1]));
-    }
-    if (strcmp(self->cliArgument.item[index], "--komi") == 0) {
-      ((Go *)self->game)->komi = atof(self->cliArgument.item[index+1]);
-    }
+  if(cliOptionSet(&self->options, "--handicap")) {
+    setGoHandicap(self->game,
+                  atoi(getCliOptionValue(&self->options, "--handicap")));
+  }
+  if(cliOptionSet(&self->options, "--komi")) {
+    ((Go *)self->game)->komi =
+        atof(getCliOptionValue(&self->options, "--komi"));
   }
 }
 
-
 static int boardSizeFromCLI(Goro *self)
 {
-  int index = self->cliArgument.size;
-  index--;
-  while((--index) >= 0)
-    if (strcmp(self->cliArgument.item[index], "--board") == 0)
-  {
-    return atoi(self->cliArgument.item[index+1]);
+  if(cliOptionSet(&self->options, "--board")) {
+    return atoi(getCliOptionValue(&self->options, "--board"));
   }
   return standardBoardSizes[normalBoard];
+}
+
+static void printHelp(void)
+{
+  printf("%s - %s\n", programName, programVersion);
+  printf("%s\n\n", programDescription);
+  printf("Options:\n\n");
+  printf("%s\n\n", programCLIOptions);
 }

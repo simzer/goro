@@ -8,5 +8,7 @@
 
 extern const char programName[];
 extern const char programVersion[];
+extern const char programDescription[];
+extern const char programCLIOptions[];
 
 #endif
