@@ -22,9 +22,10 @@ static Go *copyGoGame(Go *self);
 static void goMove(Go *self, BoardCoord coord);
 static int repeatedGoPosition(Go *self);
 static int goMoveDiedInstantly(Go *self, BoardCoord coord);
-static void removeDeadGroups(Go *self, BoardCell cell);
+static int removeDeadGroups(Go *self, BoardCell cell);
 static int countGoTerritory(Go *self, BoardCell cell);
 static double goScore(Go *self);
+static void printGoGameStatus(Go *self);
 
 const BoardCoordString standardGoHandicaps[maxStandardGoHandicaps]
                                           [maxStandardGoHandicaps] =
@@ -47,7 +48,9 @@ static const GameVirtualTable goVirtualtable = {
   &goGameOver,
   &goWinner,
   &evalGoPosition,
-  &copyGoGame
+  &copyGoGame,
+  &goScore,
+  &printGoGameStatus
 };
 
 void setGoHandicap(Go *self, int handicap) {
@@ -69,6 +72,8 @@ Go createGo(Board board)
   self.history[0] = 0;
   self.history[1] = 0;
   self.komi = 6.5;
+  self.captures[0] = 0;
+  self.captures[1] = 0;
   return self;
 }
 
@@ -79,19 +84,24 @@ static void goMove(Go *self, BoardCoord coord)
   self->history[1] = self->history[0];
   self->history[0] = stored;
   gameMove(self, coord);
-  removeDeadGroups(self, gamePlayerCells[actualGamePlayer(self)]);
-  removeDeadGroups(self, gamePlayerCells[otherGamePlayer(self)]);
+  self->captures[otherGamePlayer(self)] +=
+    removeDeadGroups(self, gamePlayerCells[actualGamePlayer(self)]);
+  self->captures[actualGamePlayer(self)] +=
+    removeDeadGroups(self, gamePlayerCells[otherGamePlayer(self)]);
 }
 
-static void removeDeadGroups(Go *self, BoardCell cell) {
+static int removeDeadGroups(Go *self, BoardCell cell) {
+  int removedStones = 0;
   GroupList groupList = createGroupList(&(self->game.board));
   GroupIterator iterator = createGroupIterator(&groupList);
   while(getGroupsByColor(&iterator, cell)) {
     if (groupLiberties(iterator.group) == 0) {
+      removedStones += iterator.group->size;
       removeGroup(iterator.group);
     }
   }
   destructGroupList(&groupList);
+  return removedStones;
 }
 
 static Go *copyGoGame(Go *self)
@@ -101,6 +111,8 @@ static Go *copyGoGame(Go *self)
   copy->history[0] = self->history[0] ? copyGame(self->history[0]) : 0;
   copy->history[1] = self->history[1] ? copyGame(self->history[1]) : 0;
   copy->komi = self->komi;
+  copy->captures[0] = self->captures[0];
+  copy->captures[1] = self->captures[1];
   return copy;
 }
 
@@ -165,7 +177,9 @@ static int countGoTerritory(Go *self, BoardCell cell) {
 static double goScore(Go *self)
 {
   return   countGoTerritory(self, gamePlayerCells[firstPlayer])
+         + self->captures[firstPlayer]
          - countGoTerritory(self, gamePlayerCells[secondPlayer])
+         - self->captures[secondPlayer]
          - self->komi;
 }
 
@@ -191,3 +205,9 @@ static double evalGoPosition(Go *self)
   }
 }
 
+static void printGoGameStatus(Go *self)
+{
+  printGameStatus(self);
+  printf("Black captured: %d, White captured: %d\n\n",
+         self->captures[firstPlayer], self->captures[secondPlayer]);
+}

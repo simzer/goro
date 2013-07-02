@@ -93,13 +93,25 @@ int nextMoveWorthChecking(Game *self, BoardIterator *iterator)
   return result;
 }
 
-void printGameOverInfo(Game *game)
+void printGameStatus(Game *self)
 {
-  PlayerId winner = game->vtable->winner(game);
-  printBoard(&game->board);
+  printBoard(&self->board);
+  if(!boardCoordsEqual(self->lastMove, nullBoardCoord)) {
+    BoardCoordString coord = boardCoordToString(self->lastMove);
+    printf("\nLast move: %s\n\n", coord.chars);
+  }
+}
+
+void printGameOverInfo(Game *self)
+{
+  PlayerId winner = self->vtable->winner(self);
+  printBoard(&self->board);
   printf(winner == noPlayer
          ? "Nobody won!\n"
          : "%s (%s) won!\n",
            gamePlayerNames[winner],
            boardCellNames[gamePlayerCells[winner]]);
+  if (self->vtable->score) {
+    printf("Score: %lf\n", self->vtable->score(self));
+  }
 }

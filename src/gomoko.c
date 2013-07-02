@@ -31,7 +31,9 @@ static const GameVirtualTable gomokoVirtualtable = {
   &gomokoGameOver,
   &gomokoWinner,
   &evalGomokoPosition,
-  &copyGomokoGame
+  &copyGomokoGame,
+  0,
+  &printGameStatus
 };
 
 Gomoko createGomoko(Board board)

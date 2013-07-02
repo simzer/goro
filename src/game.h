@@ -16,6 +16,17 @@ typedef enum {
   numberOfPlayers = 2
 } PlayerId;
 
+typedef enum {
+  playMove,
+  passMove,
+  resignMove,
+} GameMoveType;
+
+typedef struct GameMove {
+  BoardCoord coord;
+  GameMoveType type;
+} GameMove;
+
 typedef struct Game Game;
 
 typedef struct GameVirtualTable {
@@ -26,6 +37,8 @@ typedef struct GameVirtualTable {
   PlayerId (*winner)(Game *self);
   double (*evalPosition)(Game *self);
   Game *(*copy)(Game *self);
+  double (*score)(Game *self);
+  void (*printGameStatus)(Game *self);
 } GameVirtualTable;
 
 struct Game {
@@ -46,6 +59,7 @@ extern int nextValidGameMove(Game *self, BoardIterator *iterator);
 extern int nextMoveWorthChecking(Game *self, BoardIterator *iterator);
 extern PlayerId otherGamePlayer(Game *self);
 extern PlayerId actualGamePlayer(Game *self);
-extern void printGameOverInfo(Game *game);
+extern void printGameOverInfo(Game *self);
+extern void printGameStatus(Game *self);
 
 #endif

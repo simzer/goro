@@ -23,7 +23,7 @@ static BoardCoord getCLIPlayerMove(CLIPlayer *self)
   BoardCoordString string;
   int  rowIndex;
   Game* game = ((Player *)self)->game;
-  printBoard(&game->board);
+  game->vtable->printGameStatus(game);
   do {
     printf("Player %d step: ", game->actualPlayer);
     scanf("%3s", string.chars);

@@ -12,6 +12,7 @@ typedef struct Go {
   Game game;
   Game *history[2];
   double komi;
+  int captures[numberOfPlayers];
 } Go;
 
 #define maxStandardGoHandicaps 9

@@ -25,7 +25,9 @@ static const GameVirtualTable ticTacToeVirtualTable = {
   &ticTacToeGameOver,
   &ticTacToeWinner,
   &evalTicTacToePosition,
-  &copyGame
+  &copyGame,
+  0,
+  &printGameStatus
 };
 
 TicTacToe createTicTacToe(BoardSize size)
