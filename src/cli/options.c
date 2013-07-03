@@ -5,6 +5,8 @@
 
 #include "options.h"
 
+char *invalidOptionValue = "";
+
 CliOptionParser createCliOptionParser(int argc, char **argv)
 {
   CliOptionParser self;
@@ -28,5 +30,5 @@ char *getCliOptionValue(CliOptionParser *self, char *option)
   while((--index) >= 0) {
     if (strcmp(self->options[index], option) == 0) return self->options[index+1];
   }
-  return 0;
+  return invalidOptionValue;
 }
