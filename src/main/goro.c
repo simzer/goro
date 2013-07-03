@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "board.h"
-#include "game.h"
+#include "goro.h"
 #include "tictactoe.h"
 #include "gomoko.h"
 #include "go.h"
@@ -17,16 +16,7 @@
 #include "gtp.h"
 #include "testplayer.h"
 #include "about.h"
-#include "options.h"
 
-typedef struct {
-  CliOptionParser options;
-  Game *game;
-  Player *players[2];
-} Goro;
-static void runGoro(Goro *self);
-static Goro createGoro(int argc, char *argv[]);
-static void destructGoro(Goro *self);
 static void initGoroGameFromCLI(Goro *self);
 static void initGoroPlayersFromCLI(Goro *self);
 static void setDefaultNotInitializedPlayers(Goro *self);
@@ -34,14 +24,6 @@ static void goParametersFromCLI(Goro *self);
 static int boardSizeFromCLI(Goro *self);
 static void printHelp(void);
 static Player *createPlayerByName(Goro *self, char *type);
-
-int main(int argc, char *argv[])
-{
-  Goro goro = createGoro(argc, argv);
-  runGoro(&goro);
-  destructGoro(&goro);
-  return 0;
-}
 
 static Goro createGoro(int argc, char *argv[])
 {

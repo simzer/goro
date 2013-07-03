@@ -5,7 +5,9 @@
 #include "boardcoord.h"
 
 int main (int argc, char *argv[]) {
-  assert(0);
+  BoardCoord coord = createBoardCoord(5, 6);
+  assert(coord.col == 6);
+  assert(coord.row == 5);
 }
 
 
