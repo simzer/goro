@@ -1,3 +1,4 @@
+#!/bin/bash
 #BLACK="gnugo --mode gtp"
 #WHITE="bin/goro --black gtp --white test"
 WHITE="gnugo --mode gtp"
