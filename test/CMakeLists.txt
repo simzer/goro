@@ -1,4 +1,6 @@
 enable_testing()
 include_directories(. ../src)
 add_executable(gorotest gorotest.c)
+target_link_libraries(gorotest m libgoro)
+include_directories(../src/board ../src/cli ../src/games ../src/player)
 add_test(gorotest test/bin/gorotest)

@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[])
 {
-  Goro goro = createGoro(argc, argv);
+  Goro goro = createGoroFromCLIOption(argc, argv);
   runGoro(&goro);
   destructGoro(&goro);
   return 0;

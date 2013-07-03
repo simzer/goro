@@ -25,7 +25,7 @@ static int boardSizeFromCLI(Goro *self);
 static void printHelp(void);
 static Player *createPlayerByName(Goro *self, char *type);
 
-static Goro createGoro(int argc, char *argv[])
+Goro createGoroFromCLIOption(int argc, char *argv[])
 {
   Goro self;
   self.options = createCliOptionParser(argc, argv);
@@ -41,7 +41,7 @@ static Goro createGoro(int argc, char *argv[])
   return self;
 }
 
-static void destructGoro(Goro *self)
+void destructGoro(Goro *self)
 {
   if(self->game) {
     destructGame(self->game);
@@ -51,7 +51,7 @@ static void destructGoro(Goro *self)
   if(self->players[1]) free(self->players[1]); self->players[1] = 0;
 }
 
-static void runGoro(Goro *self)
+void runGoro(Goro *self)
 {
   while(!self->game->vtable->over(self->game))
   {

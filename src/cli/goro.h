@@ -10,13 +10,14 @@
 #include "player.h"
 #include "options.h"
 
-typedef struct {
+struct Goro {
   CliOptionParser options;
   Game *game;
   Player *players[2];
-} Goro;
+};
+typedef struct Goro Goro;
 void runGoro(Goro *self);
-Goro createGoro(int argc, char *argv[]);
+Goro createGoroFromCLIOption(int argc, char *argv[]);
 void destructGoro(Goro *self);
 
 #endif

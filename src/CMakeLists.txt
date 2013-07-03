@@ -1,0 +1,5 @@
+file(GLOB_RECURSE sourcelist . */*.c)
+add_library(libgoro ${sourcelist})
+add_executable (goro main.c)
+target_link_libraries(goro m libgoro)
+include_directories(board cli games player)
