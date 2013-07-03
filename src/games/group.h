@@ -6,6 +6,8 @@
 #ifndef __GROUP_H__
 #define __GROUP_H__
 
+#include "board.h"
+
 typedef struct Group {
   Board *board;
   BoardCoord *cells;

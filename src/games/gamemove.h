@@ -6,7 +6,6 @@
 #ifndef __GAMEMOVE_H__
 #define __GAMEMOVE_H__
 
-#include "board.h"
 #include "boarditerator.h"
 
 typedef enum {

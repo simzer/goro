@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "board.h"
 #include "boarditerator.h"
 #include "group.h"
 
