@@ -36,13 +36,23 @@ const Neighbourhood fourNeighbourhood = { 0, 3, fourNeighbours };
 const Neighbourhood eightNeighbourhood = { 0, 7, eightNeighbours };
 
 char boardColumnToChar(BoardSize column) {
-  return boardColumnCharacters[column];
+  if (   column >= 0
+      && column < sizeof(boardColumnCharacters)-1)
+  {
+    return boardColumnCharacters[column];
+  } else {
+    fprintf(stderr, "Invalid board column: %d\n", column);
+    return '?';
+  }
 }
 
 BoardSize charToBoardColumn(char character) {
   BoardSize column = 0;
-  while(boardColumnCharacters[column] != character) {
-    if (column >= sizeof(boardColumnCharacters)) return -1;
+  while(boardColumnCharacters[column] != toupper(character)) {
+    if (column >= sizeof(boardColumnCharacters)) {
+      fprintf(stderr, "Invalid board column character: %c\n", character);
+      return -1;
+    }
     column++;
   }
   return column;
@@ -87,7 +97,9 @@ BoardCoord stringToBoardCoord(BoardCoordString string)
   BoardCoord coord;
   char character;
   int number;
-  int partsFound = sscanf(string.chars, "%c%d", &character, &number);
+  int partsFound = sscanf(string.chars,
+                          "%[abcdefghjklmnopqrstABCDEFGHJKLMNOPQRST]%d",
+                          &character, &number);
   coord.col = charToBoardColumn(toupper(character));
   coord.row = number-1;
   if(partsFound != 2 || number == -1) {
@@ -100,7 +112,8 @@ BoardCoord stringToBoardCoord(BoardCoordString string)
 BoardCoordString boardCoordToString(BoardCoord coord)
 {
   BoardCoordString string;
-  int charsWritten = (boardCoordsEqual(coord, nullBoardCoord))
+  int charsWritten = (  (boardCoordsEqual(coord, nullBoardCoord))
+                      ||(coord.row < 0 || coord.col < 0) )
       ? snprintf(string.chars, sizeof(string.chars), "nan")
       : snprintf(string.chars, sizeof(string.chars), "%c%d",
                  boardColumnCharacters[coord.col], coord.row+1);
