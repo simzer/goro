@@ -196,6 +196,15 @@ Board loadBoard(FILE *file)
   return(self);
 }
 
+int isBoardClear(Board *self)
+{
+  int i;
+  for(i = 0; i < self->width * self->height; i++) {
+    if (self->cells[i] != 0) return 0;
+  }
+  return 1;
+}
+
 BoardCoord mirrorBoardCoord(Board *self, BoardCoord coord) {
   return createBoardCoord(self->height - 1 - coord.row,
                           self->width - 1 - coord.col);

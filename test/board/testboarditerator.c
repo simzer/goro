@@ -7,6 +7,48 @@
 
 #include "boarditerator.h"
 
+static void testCreateNeighbourIterator(void)
+{
+
+}
+
+static void testGetNeighbours(void)
+{
+
+}
+
+static void testGetNeighbourDirection(void)
+{
+
+}
+
+static void testCreateBoardLineIterator(void)
+{
+
+}
+
+static void testGetBoardLineCoords(void)
+{
+
+}
+
+static void testCreateBoardIterator(void)
+{
+
+}
+
+static void testBoardIteratorFinished(void)
+{
+
+}
+
 void testboarditerator(void)
 {
+  testCreateNeighbourIterator();
+  testGetNeighbours();
+  testGetNeighbourDirection();
+  testCreateBoardLineIterator();
+  testGetBoardLineCoords();
+  testCreateBoardIterator();
+  testBoardIteratorFinished();
 }
