@@ -8,101 +8,136 @@
 
 #include "boardcoord.h"
 
-static void testCreateBoardCoordString(void)
-{
-  char string[] = "f5";
-  BoardCoordString coordString = createBoardCoordString(string);
+#include "testboardcoord.h"
+
+static void boardCoardStringEqual(char* input, char* reference) {
+  BoardCoordString coordString = createBoardCoordString(input);
+  assert(strcmp(coordString.chars, reference) == 0);
+}
+
+static void boardCoordsOperationResults(BoardCoord coord, int row, int col) {
+  assert(coord.col == col);
+  assert(coord.row == row);
+}
+
+static void boardCoordsConvertedToString(int row, int col, char *string) {
+  BoardCoordString coordString =
+      boardCoordToString(createBoardCoord(row, col));
   assert(strcmp(coordString.chars, string) == 0);
 }
 
-static void testCharToBoardColumn(void)
+static void stringConvertedToBoardCoord(char *string, int row, int col)
+{
+  BoardCoord coord1 = createBoardCoord(row, col);
+  BoardCoord coord2 = stringToBoardCoord(createBoardCoordString(string));
+  assert(boardCoordsEqual(coord1, coord2));
+}
+
+static void stringShouldConvertedToNullCoord(char *string)
+{
+  BoardCoord coord = stringToBoardCoord(createBoardCoordString(string));
+  assert(boardCoordsEqual(coord, nullBoardCoord));
+}
+
+static void validStringCopiedToBoardCoordString(void)
+{
+  boardCoardStringEqual("f5","f5");
+}
+
+static void longStringChompedInBoardCoordString(void)
+{
+  boardCoardStringEqual("abcd","abc");
+}
+
+static void bothCasedCharsConvertedToColumnIndex(void)
 {
   assert(charToBoardColumn('a') == 0);
   assert(charToBoardColumn('t') == 18);
   assert(charToBoardColumn('A') == 0);
   assert(charToBoardColumn('T') == 18);
+}
+
+static void invalidCharConvertedToInvalidColumnIndex(void)
+{
   assert(charToBoardColumn('?') == -1);
 }
 
-static void testBoardColumnToChar(void)
+static void validColumnIndicesConvertedToUpperCaseChars(void)
 {
   assert(boardColumnToChar(0) == 'A');
   assert(boardColumnToChar(18) == 'T');
+}
+
+static void invalidColumnIndicesConvertedToQuestionMark(void)
+{
   assert(boardColumnToChar(19) == '?');
   assert(boardColumnToChar(-1) == '?');
 }
 
-static void testCreateBoardCoord(void)
+static void boardCoordGetsCoordinates(void)
 {
-  BoardCoord coord = createBoardCoord(5, 6);
-  assert(coord.col == 6);
-  assert(coord.row == 5);
+  boardCoordsOperationResults(createBoardCoord(5, 6), 5, 6);
 }
 
-static void testAddBoardCoords(void)
+static void boardCoordAdditionWorksInRange(void)
+{
+  boardCoordsOperationResults(addBoardCoords(createBoardCoord(5, 6),
+                                            createBoardCoord(7, 9)),
+                             5 + 7, 6 + 9);
+}
+
+static void boardCoordSubtractionWorksInRange(void)
+{
+  boardCoordsOperationResults(subBoardCoords(createBoardCoord(7, 9),
+                                            createBoardCoord(5, 6)),
+                             7 - 5, 9 - 6);
+}
+
+static void boardCoordMultiplicationWorkInRange(void)
+{
+  boardCoordsOperationResults(mulBoardCoord(3, createBoardCoord(5, 6)),
+                             3 * 5, 3 * 6);
+}
+
+static void sameBoardCoordsAreEqual(void)
 {
   BoardCoord coord1 = createBoardCoord(5, 6);
-  BoardCoord coord2 = createBoardCoord(7, 9);
-  BoardCoord added = addBoardCoords(coord1, coord2);
-  assert(added.col == 6+9);
-  assert(added.row == 5+7);
+  assert(boardCoordsEqual(coord1, coord1));
 }
 
-static void testSubBoardCoords(void)
-{
-  BoardCoord coord1 = createBoardCoord(5, 6);
-  BoardCoord coord2 = createBoardCoord(7, 9);
-  BoardCoord substracted = subBoardCoords(coord2, coord1);
-  assert(substracted.col == 9-6);
-  assert(substracted.row == 7-5);
-}
-
-static void testMulBoardCoord(void)
-{
-  BoardCoord multiplied = mulBoardCoord(3, createBoardCoord(5, 6));
-  assert(multiplied.col == 6*3);
-  assert(multiplied.row == 5*3);
-}
-
-static void testBoardCoordsEqual(void)
+static void differentBoardCoordAreNotEqual(void)
 {
   BoardCoord coord1 = createBoardCoord(5, 6);
   BoardCoord coord2 = createBoardCoord(5, 9);
   BoardCoord coord3 = createBoardCoord(7, 6);
   assert(!boardCoordsEqual(coord1, coord2));
   assert(!boardCoordsEqual(coord1, coord3));
-  assert(boardCoordsEqual(coord1, coord1));
 }
 
-static void testStringToBoardCoord(void)
+static void validStringsConvertedToBoardCoord(void)
 {
-  BoardCoord coord1 = createBoardCoord(5, 6);
-  BoardCoord coord2 = stringToBoardCoord(createBoardCoordString("g6"));
-  BoardCoord coord3 = stringToBoardCoord(createBoardCoordString("G6"));
-  BoardCoord coord4 = stringToBoardCoord(createBoardCoordString("45"));
-  BoardCoord coord5 = stringToBoardCoord(createBoardCoordString("ff"));
-  BoardCoord coord6 = createBoardCoord(15, 9);
-  BoardCoord coord7 = stringToBoardCoord(createBoardCoordString("K16"));
-  BoardCoord coord8 = stringToBoardCoord(createBoardCoordString("X16"));
-  assert(boardCoordsEqual(coord1, coord2));
-  assert(boardCoordsEqual(coord1, coord3));
-  assert(boardCoordsEqual(nullBoardCoord, coord4));
-  assert(boardCoordsEqual(nullBoardCoord, coord5));
-  assert(boardCoordsEqual(coord6, coord7));
-  assert(boardCoordsEqual(nullBoardCoord, coord8));
+  stringConvertedToBoardCoord("g6", 5, 6);
+  stringConvertedToBoardCoord("G6", 5, 6);
+  stringConvertedToBoardCoord("K16", 15, 9);
 }
 
-static void testBoardCoordToString(void)
+static void invalidStringsConvertedToNullCoord(void)
 {
-  BoardCoordString string1 = boardCoordToString(createBoardCoord(5,6));
-  BoardCoordString string2 = boardCoordToString(createBoardCoord(15,9));
-  BoardCoordString string3 = boardCoordToString(createBoardCoord(-1,9));
-  BoardCoordString string4 = boardCoordToString(createBoardCoord(5,-1));
-  assert(strcmp(string1.chars, "G6") == 0);
-  assert(strcmp(string2.chars, "K16") == 0);
-  printf(string3.chars);
-  assert(strcmp(string3.chars, "nan") == 0);
-  assert(strcmp(string4.chars, "nan") == 0);
+  stringShouldConvertedToNullCoord("45");
+  stringShouldConvertedToNullCoord("ff");
+  stringShouldConvertedToNullCoord("X16");
+}
+
+static void validCoordinatesConvertedToCoordString(void)
+{
+  boardCoordsConvertedToString(5, 6, "G6");
+  boardCoordsConvertedToString(15, 9, "K16");
+}
+
+static void invalidCoordinatesConvertedToNanString(void)
+{
+  boardCoordsConvertedToString(-1, 9, "nan");
+  boardCoordsConvertedToString(5, -1, "nan");
 }
 
 static void testHalfNeighbourhood(void)
@@ -115,15 +150,21 @@ static void testHalfNeighbourhood(void)
 
 void testboardcoord(void)
 {
-  testCreateBoardCoordString();
-  testCharToBoardColumn();
-  testBoardColumnToChar();
-  testCreateBoardCoord();
-  testAddBoardCoords();
-  testSubBoardCoords();
-  testMulBoardCoord();
-  testBoardCoordsEqual();
-  testStringToBoardCoord();
-  testBoardCoordToString();
+  validStringCopiedToBoardCoordString();
+  longStringChompedInBoardCoordString();
+  bothCasedCharsConvertedToColumnIndex();
+  invalidCharConvertedToInvalidColumnIndex();
+  validColumnIndicesConvertedToUpperCaseChars();
+  invalidColumnIndicesConvertedToQuestionMark();
+  boardCoordGetsCoordinates();
+  boardCoordAdditionWorksInRange();
+  boardCoordSubtractionWorksInRange();
+  boardCoordMultiplicationWorkInRange();
+  sameBoardCoordsAreEqual();
+  differentBoardCoordAreNotEqual();
+  validStringsConvertedToBoardCoord();
+  invalidStringsConvertedToNullCoord();
+  validCoordinatesConvertedToCoordString();
+  invalidCoordinatesConvertedToNanString();
   testHalfNeighbourhood();
 }

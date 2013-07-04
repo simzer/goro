@@ -9,7 +9,13 @@
 
 #include "board.h"
 
-static void testBoardCellFilled(void)
+static Board full19x19Board(void) {
+  Board board = createSquareBoard(19);
+  memset(board.cells, blackBoardCell, 19*19);
+  return board;
+}
+
+static void boardCellEmptyFillStateDetected(void)
 {
   assert(boardCellFilled(blackBoardCell));
   assert(boardCellFilled(whiteBoardCell));
@@ -17,27 +23,30 @@ static void testBoardCellFilled(void)
   assert(!boardCellFilled(invalidBoardCell));
 }
 
-static void testCreateBoard(void)
+static void newBoardGetsSizes(void)
 {
-  int i;
   Board board = createBoard(3,4);
   assert(board.width == 3);
   assert(board.height == 4);
-  assert(board.cells != 0);
 }
 
-static void testIsBoardClear(void) {
+static void clearBoardDetected(void) {
   Board board = createSquareBoard(4);
   assert(isBoardClear(&board));
   setBoardCell(&board, createBoardCoord(3,3), blackBoardCell);
   assert(!isBoardClear(&board));
 }
 
-static void testCreateSquareBoard(void)
+static void squareBoardHasSameSizedSide(void)
 {
   Board board = createSquareBoard(4);
   assert(board.width == 4);
   assert(board.height == 4);
+}
+
+static void newBoardIsClear(void)
+{
+  Board board = createSquareBoard(4);
   assert(isBoardClear(&board));
 }
 
@@ -46,7 +55,7 @@ static void testLoadBoard(void)
   // todo: create test, function not used yet, is it necessary at all?
 }
 
-static void testCopyBoard(void)
+static void copyResultsEqualBoardsOnDifferentMemorySpace(void)
 {
   int i;
   Board board = createBoard(10, 15);
@@ -59,14 +68,14 @@ static void testCopyBoard(void)
   assert(boardEqual(&board, &board2));
 }
 
-static void testClearBoard(void)
+static void boardCanBeCleared(void)
 {
   Board board = createBoard(3,4);
   clearBoard(&board);
   assert(isBoardClear(&board));
 }
 
-static void testBoardEqual(void)
+static void equalityDetectedOnSameAndDifferentBoards(void)
 {
   Board board = createBoard(10, 15);
   Board board2 = createBoard(10, 15);
@@ -77,21 +86,21 @@ static void testBoardEqual(void)
   assert(boardEqual(&board, &board2));
 }
 
-static void testDestructBoard(void)
+static void boardDestructionNullifiesMemoryPointer(void)
 {
   Board board = createSquareBoard(19);
   destructBoard(&board);
   assert(board.cells == 0);
 }
 
-static void testGetBoardCell(void)
+static void cellCanBeReadFromBoard(void)
 {
   Board board = createSquareBoard(19);
   board.cells[19*19/2] = blackBoardCell;
   assert(getBoardCell(&board, boardTengen(&board)) == blackBoardCell);
 }
 
-static void testSetBoardCell(void)
+static void setCellReadAsSet(void)
 {
   Board board = createSquareBoard(19);
   setBoardCell(&board, createBoardCoord(5,7), blackBoardCell);
@@ -99,7 +108,7 @@ static void testSetBoardCell(void)
   // todo: how to test out of range assertion?
 }
 
-static void testClearBoardCell(void)
+static void clearedCellReadAsClear(void)
 {
   Board board = createSquareBoard(19);
   memset(board.cells, blackBoardCell, 19*19);
@@ -109,13 +118,18 @@ static void testClearBoardCell(void)
   // todo: how to test out of range assertion?
 }
 
-static void testCoordInBoard(void)
+static void inRangeCoordsAreOnBoard(void)
+{
+  Board board = createSquareBoard(19);
+  assert(coordInBoard(&board, createBoardCoord(0,0)));
+  assert(coordInBoard(&board, createBoardCoord(18,18)));
+}
+
+static void outOfRangeCoordsAreNotOnBoard(void)
 {
   Board board = createSquareBoard(19);
   assert(!coordInBoard(&board, createBoardCoord(-1,0)));
   assert(!coordInBoard(&board, createBoardCoord(0,-1)));
-  assert(coordInBoard(&board, createBoardCoord(0,0)));
-  assert(coordInBoard(&board, createBoardCoord(18,18)));
   assert(!coordInBoard(&board, createBoardCoord(18,19)));
   assert(!coordInBoard(&board, createBoardCoord(19,18)));
 }
@@ -130,16 +144,15 @@ static void testSaveBoard(void)
   // todo: create test, function not used yet, is it necessary at all?
 }
 
-static void testBoardHasEmptyCell(void)
+static void notFullBoardCanBeDetected(void)
 {
-  Board board = createSquareBoard(19);
-  memset(board.cells, blackBoardCell, 19*19);
+  Board board = full19x19Board();
   assert(!boardHasEmptyCell(&board));
   clearBoardCell(&board, createBoardCoord(18,18));
   assert(boardHasEmptyCell(&board));
 }
 
-static void testBoardCellHasNeighbour(void)
+static void boardCellNeighbourDetected(void)
 {
   Board board = createSquareBoard(19);
   assert(!boardCellHasNeighbour(&board,boardTengen(&board), fourNeighbourhood));
@@ -151,18 +164,28 @@ static void testBoardCellHasNeighbour(void)
   assert(boardCellHasNeighbour(&board, boardTengen(&board), eightNeighbourhood));
 }
 
-static void testMirrorBoardCoord(void)
+static void boardCoordsAreMirror(int row, int col, int mirrorRow, int mirrorCol)
 {
   Board board = createSquareBoard(19);
-  assert(boardCoordsEqual(mirrorBoardCoord(&board, createBoardCoord(0,18)),
-                                                   createBoardCoord(18,0)));
-  assert(boardCoordsEqual(mirrorBoardCoord(&board, createBoardCoord(18,18)),
-                                                   createBoardCoord(0,0)));
+  assert(boardCoordsEqual(mirrorBoardCoord(&board, createBoardCoord(row,col)),
+                          createBoardCoord(mirrorRow, mirrorCol)));
+}
+
+static void boardCoordCanBeMirrored(void)
+{
+  boardCoordsAreMirror(0, 18, 18, 0);
+  boardCoordsAreMirror(18, 18, 0, 0);
+  boardCoordsAreMirror(18, 18, 0, 0);
+}
+
+static void tengenIsItselfIfMirrored(void)
+{
+  Board board = createSquareBoard(19);
   assert(boardCoordsEqual(mirrorBoardCoord(&board, boardTengen(&board)),
                                                    boardTengen(&board)));
 }
 
-static void testBoardTengen(void)
+static void tengenIsCenterOfBoard(void)
 {
   Board board = createSquareBoard(19);
   assert(boardCoordsEqual(boardTengen(&board), createBoardCoord(9,9)));
@@ -170,23 +193,26 @@ static void testBoardTengen(void)
 
 void testboard(void)
 {
-  testBoardCellFilled();
-  testCreateBoard();
-  testCreateSquareBoard();
-  testLoadBoard();
-  testCopyBoard();
-  testClearBoard();
-  testBoardEqual();
-  testDestructBoard();
-  testGetBoardCell();
-  testSetBoardCell();
-  testClearBoardCell();
-  testCoordInBoard();
+  boardCellEmptyFillStateDetected();
+  newBoardGetsSizes();
+  newBoardIsClear();
+  squareBoardHasSameSizedSide();
+  copyResultsEqualBoardsOnDifferentMemorySpace();
+  boardCanBeCleared();
+  equalityDetectedOnSameAndDifferentBoards();
+  boardDestructionNullifiesMemoryPointer();
+  cellCanBeReadFromBoard();
+  setCellReadAsSet();
+  clearedCellReadAsClear();
+  inRangeCoordsAreOnBoard();
+  outOfRangeCoordsAreNotOnBoard();
+  notFullBoardCanBeDetected();
+  boardCellNeighbourDetected();
+  boardCoordCanBeMirrored();
+  tengenIsItselfIfMirrored();
+  tengenIsCenterOfBoard();
+  clearBoardDetected();
   testPrintBoard();
   testSaveBoard();
-  testBoardHasEmptyCell();
-  testBoardCellHasNeighbour();
-  testMirrorBoardCoord();
-  testBoardTengen();
-  testIsBoardClear();
+  testLoadBoard();
 }
