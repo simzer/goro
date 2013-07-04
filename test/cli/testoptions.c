@@ -7,43 +7,45 @@
 
 #include "options.h"
 
-static char* argv[7] = {
-  "bin/goro",
-  "--option1",
-  "--option2",
-  "--option3",
-  "option4",
-  "--option5",
-  "option6",
-};
-
-static CliOptionParser options;
-
-static void optionSizeIsOneLessThanArgumentList(void) {
-  assert(options.size == 6);
+static void optionSizeIsOneLessThanArgumentList(CliOptionParser *options) {
+  assert(options->size == 6);
 }
 
-static void boundaryIndexedOptionsFound(void) {
-  assert(cliOptionSet(&options, "--option1"));
-  assert(cliOptionSet(&options, "option6"));
+static void boundaryIndexedOptionsFound(CliOptionParser *options) {
+  assert(cliOptionSet(options, "--option1"));
+  assert(cliOptionSet(options, "option6"));
 }
 
-static void queryForNotSetOptionResultsFalseWithEmptyValue(void)
+static void
+queryForNotSetOptionResultsFalseWithEmptyValue(CliOptionParser *options)
 {
-  assert(!cliOptionSet(&options, "--option7"));
-  assert(strcmp(getCliOptionValue(&options, "--options7"),"") == 0);
+  assert(!cliOptionSet(options, "--option7"));
+  assert(strcmp(getCliOptionValue(options, "--options7"),"") == 0);
 }
 
-static void optionValueFoundForLastOption(void)
+static void optionValueFoundForLastOption(CliOptionParser *options)
 {
-  assert(strcmp(getCliOptionValue(&options, "--option5"),"option6") == 0);
+  assert(strcmp(getCliOptionValue(options, "--option5"),"option6") == 0);
+}
+
+CliOptionParser createExampleOptionParser(void) {
+  static const char* argv[7] = {
+    "bin/goro",
+    "--option1",
+    "--option2",
+    "--option3",
+    "option4",
+    "--option5",
+    "option6",
+  };
+  return createCliOptionParser(sizeof(argv)/sizeof(char*), argv);
 }
 
 void testoptions(void)
 {
-  options = createCliOptionParser(sizeof(argv)/sizeof(char*), argv);
-  optionSizeIsOneLessThanArgumentList();
-  boundaryIndexedOptionsFound();
-  queryForNotSetOptionResultsFalseWithEmptyValue();
-  optionValueFoundForLastOption();
+  CliOptionParser options = createExampleOptionParser();
+  optionSizeIsOneLessThanArgumentList(&options);
+  boundaryIndexedOptionsFound(&options);
+  queryForNotSetOptionResultsFalseWithEmptyValue(&options);
+  optionValueFoundForLastOption(&options);
 }

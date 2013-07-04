@@ -8,8 +8,6 @@
 
 #include "boardcoord.h"
 
-#include "testboardcoord.h"
-
 static void boardCoardStringEqual(char* input, char* reference) {
   BoardCoordString coordString = createBoardCoordString(input);
   assert(strcmp(coordString.chars, reference) == 0);

@@ -6,8 +6,8 @@
 #include "boarditerator.h"
 
 BoardLineIterator createBoardLineIterator(BoardCoord startCoord,
-                                                 BoardCoord direction,
-                                                 BoardSize size)
+                                          BoardCoord direction,
+                                          BoardSize size)
 {
   BoardLineIterator self;
   self.index = -1;

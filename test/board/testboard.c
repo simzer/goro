@@ -28,6 +28,7 @@ static void newBoardGetsSizes(void)
   Board board = createBoard(3,4);
   assert(board.width == 3);
   assert(board.height == 4);
+  destructBoard(&board);
 }
 
 static void clearBoardDetected(void) {
@@ -35,6 +36,7 @@ static void clearBoardDetected(void) {
   assert(isBoardClear(&board));
   setBoardCell(&board, createBoardCoord(3,3), blackBoardCell);
   assert(!isBoardClear(&board));
+  destructBoard(&board);
 }
 
 static void squareBoardHasSameSizedSide(void)
@@ -42,12 +44,14 @@ static void squareBoardHasSameSizedSide(void)
   Board board = createSquareBoard(4);
   assert(board.width == 4);
   assert(board.height == 4);
+  destructBoard(&board);
 }
 
 static void newBoardIsClear(void)
 {
   Board board = createSquareBoard(4);
   assert(isBoardClear(&board));
+  destructBoard(&board);
 }
 
 static void testLoadBoard(void)
@@ -66,6 +70,8 @@ static void copyResultsEqualBoardsOnDifferentMemorySpace(void)
   assert(board.height == board2.height);
   assert(board.width == board2.width);
   assert(boardEqual(&board, &board2));
+  destructBoard(&board);
+  destructBoard(&board2);
 }
 
 static void boardCanBeCleared(void)
@@ -73,6 +79,7 @@ static void boardCanBeCleared(void)
   Board board = createBoard(3,4);
   clearBoard(&board);
   assert(isBoardClear(&board));
+  destructBoard(&board);
 }
 
 static void equalityDetectedOnSameAndDifferentBoards(void)
@@ -84,6 +91,8 @@ static void equalityDetectedOnSameAndDifferentBoards(void)
   assert(!boardEqual(&board, &board2));
   setBoardCell(&board2, createBoardCoord(14,9), blackBoardCell);
   assert(boardEqual(&board, &board2));
+  destructBoard(&board);
+  destructBoard(&board2);
 }
 
 static void boardDestructionNullifiesMemoryPointer(void)
@@ -98,6 +107,7 @@ static void cellCanBeReadFromBoard(void)
   Board board = createSquareBoard(19);
   board.cells[19*19/2] = blackBoardCell;
   assert(getBoardCell(&board, boardTengen(&board)) == blackBoardCell);
+  destructBoard(&board);
 }
 
 static void setCellReadAsSet(void)
@@ -105,6 +115,7 @@ static void setCellReadAsSet(void)
   Board board = createSquareBoard(19);
   setBoardCell(&board, createBoardCoord(5,7), blackBoardCell);
   assert(getBoardCell(&board, createBoardCoord(5,7)) == blackBoardCell);
+  destructBoard(&board);
   // todo: how to test out of range assertion?
 }
 
@@ -115,6 +126,7 @@ static void clearedCellReadAsClear(void)
   clearBoardCell(&board, createBoardCoord(5,7));
   assert(getBoardCell(&board, createBoardCoord(5,6)) != emptyBoardCell);
   assert(getBoardCell(&board, createBoardCoord(5,7)) == emptyBoardCell);
+  destructBoard(&board);
   // todo: how to test out of range assertion?
 }
 
@@ -123,6 +135,7 @@ static void inRangeCoordsAreOnBoard(void)
   Board board = createSquareBoard(19);
   assert(coordInBoard(&board, createBoardCoord(0,0)));
   assert(coordInBoard(&board, createBoardCoord(18,18)));
+  destructBoard(&board);
 }
 
 static void outOfRangeCoordsAreNotOnBoard(void)
@@ -132,6 +145,7 @@ static void outOfRangeCoordsAreNotOnBoard(void)
   assert(!coordInBoard(&board, createBoardCoord(0,-1)));
   assert(!coordInBoard(&board, createBoardCoord(18,19)));
   assert(!coordInBoard(&board, createBoardCoord(19,18)));
+  destructBoard(&board);
 }
 
 static void testPrintBoard(void)
@@ -150,6 +164,7 @@ static void notFullBoardCanBeDetected(void)
   assert(!boardHasEmptyCell(&board));
   clearBoardCell(&board, createBoardCoord(18,18));
   assert(boardHasEmptyCell(&board));
+  destructBoard(&board);
 }
 
 static void boardCellNeighbourDetected(void)
@@ -162,6 +177,7 @@ static void boardCellNeighbourDetected(void)
   setBoardCell(&board, createBoardCoord(9,10), blackBoardCell);
   assert(boardCellHasNeighbour(&board, boardTengen(&board), fourNeighbourhood));
   assert(boardCellHasNeighbour(&board, boardTengen(&board), eightNeighbourhood));
+  destructBoard(&board);
 }
 
 static void boardCoordsAreMirror(int row, int col, int mirrorRow, int mirrorCol)
@@ -169,6 +185,7 @@ static void boardCoordsAreMirror(int row, int col, int mirrorRow, int mirrorCol)
   Board board = createSquareBoard(19);
   assert(boardCoordsEqual(mirrorBoardCoord(&board, createBoardCoord(row,col)),
                           createBoardCoord(mirrorRow, mirrorCol)));
+  destructBoard(&board);
 }
 
 static void boardCoordCanBeMirrored(void)
@@ -183,12 +200,14 @@ static void tengenIsItselfIfMirrored(void)
   Board board = createSquareBoard(19);
   assert(boardCoordsEqual(mirrorBoardCoord(&board, boardTengen(&board)),
                                                    boardTengen(&board)));
+  destructBoard(&board);
 }
 
 static void tengenIsCenterOfBoard(void)
 {
   Board board = createSquareBoard(19);
   assert(boardCoordsEqual(boardTengen(&board), createBoardCoord(9,9)));
+  destructBoard(&board);
 }
 
 void testboard(void)
