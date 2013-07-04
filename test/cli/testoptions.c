@@ -7,7 +7,8 @@
 
 #include "options.h"
 
-static char* argv[6] = {
+static char* argv[7] = {
+  "bin/goro",
   "--option1",
   "--option2",
   "--option3",

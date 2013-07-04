@@ -10,8 +10,8 @@ char *invalidOptionValue = "";
 CliOptionParser createCliOptionParser(int argc, char **argv)
 {
   CliOptionParser self;
-  self.size = argc;
-  self.options = argv;
+  self.size = argc-1;
+  self.options = argv+1;
   return self;
 }
 

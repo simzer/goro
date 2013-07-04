@@ -10,10 +10,14 @@
 
 #define TEST(testname) \
 { \
-  if(cliOptionSet(&options, #testname)) testname(); \
+  if(cliOptionSet(&options, #testname)) { \
+    testname(); \
+    testsRun++; \
+  } \
 }
 
 int main (int argc, char *argv[]) {
+  int testsRun = 0;
   CliOptionParser options = createCliOptionParser(argc, argv);
   TEST(testboard)
   TEST(testboardcoord)
@@ -30,6 +34,7 @@ int main (int argc, char *argv[]) {
   TEST(testgtp)
   TEST(testminimax)
   TEST(testtestplayer)
+  assert(testsRun == options.size);
   return 0;
 }
 
