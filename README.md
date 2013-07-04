@@ -4,8 +4,10 @@ GORO
 
 INSTALL
 
-  cmake .
+  cd build
+  cmake ..
   make
+  ctest
   make install
 
 BUGS
