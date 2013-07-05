@@ -69,8 +69,8 @@ Go createGo(Board board)
   Go self;
   self.game = createGame(board);
   self.game.vtable = &goVirtualtable;
-  self.history[0] = 0;
-  self.history[1] = 0;
+  self.history[0] = copyBoard(&board);
+  self.history[1] = copyBoard(&board);
   self.komi = 6.5;
   self.captures[0] = 0;
   self.captures[1] = 0;
@@ -82,10 +82,9 @@ static void goMove(Go *self, GameMove move)
   if (move.type == passMove && self->game.lastMove.type == passMove) {
     self->game.winner = goWinner(self); // implement a game finished flag instead
   } else {
-    Go *stored = copyGoGame(self);
-    if(self->history[1]) destructGame(self->history[1]);
+    destructBoard(&self->history[1]);
     self->history[1] = self->history[0];
-    self->history[0] = stored;
+    self->history[0] = copyBoard(&self->game.board);
     genericGameMove(self, move);
     self->captures[otherGamePlayer(self)] +=
       removeDeadGroups(self, gamePlayerCells[actualGamePlayer(self)]);
@@ -112,8 +111,8 @@ static Go *copyGoGame(Go *self)
 {
   Go *copy = copyGame(self);
   copy = (Go *)realloc(copy, sizeof(Go));
-  copy->history[0] = self->history[0] ? copyGame(self->history[0]) : 0;
-  copy->history[1] = self->history[1] ? copyGame(self->history[1]) : 0;
+  copy->history[0] = copyBoard(&self->history[0]);
+  copy->history[1] = copyBoard(&self->history[1]);
   copy->komi = self->komi;
   copy->captures[0] = self->captures[0];
   copy->captures[1] = self->captures[1];
@@ -141,9 +140,8 @@ static int goMoveDiedInstantly(Go *self, BoardCoord coord) {
 }
 
 static int repeatedGoPosition(Go *self) {
-  return    self->history[1]
-         && boardEqual(&self->game.board,
-                       &self->history[1]->board);
+  return boardEqual(&self->game.board,
+                    &self->history[1]);
 }
 
 static int goMoveWorthChecking(Go *self, GameMove move)

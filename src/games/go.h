@@ -10,7 +10,7 @@
 
 typedef struct Go {
   Game game;
-  Game *history[2];
+  Board history[2];
   double komi;
   int captures[numberOfPlayers];
 } Go;
