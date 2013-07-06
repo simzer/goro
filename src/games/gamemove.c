@@ -43,6 +43,12 @@ GameMove createPlayMove(BoardCoord coord)
   return self;
 }
 
+void printGameMove(GameMove self)
+{
+  GameMoveString string = gameMoveToString(self);
+  printf("%s", string.chars);
+}
+
 GameMove stringToGameMove(GameMoveString string) {
   GameMove self;
   self.coord = stringToBoardCoord(createBoardCoordString(string.chars));

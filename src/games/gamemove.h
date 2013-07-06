@@ -25,6 +25,7 @@ extern GameMove createPlayMove(BoardCoord coord);
 extern GameMove createResignMove();
 extern GameMove createPassMove();
 extern int gameMoveEqual(GameMove self, GameMove res);
+extern void printGameMove(GameMove self);
 
 typedef struct GameMoveString {
   char chars[5];

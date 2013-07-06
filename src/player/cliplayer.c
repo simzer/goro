@@ -26,7 +26,7 @@ GameMove getCLIPlayerMove(CLIPlayer *self)
   game->vtable->printGameStatus(game);
   do {
     printf("Player %d step: ", game->actualPlayer);
-    scanf("%3s", string.chars);
+    scanf("%4s", string.chars);
     if (strcmp(string.chars,"q") == 0) exit(0); //todo: exit properly
     move = stringToGameMove(string);
   } while (!game->vtable->validMove(game, move)
