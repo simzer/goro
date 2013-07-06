@@ -16,11 +16,12 @@ static int anyDiagonalFilled(TicTacToe *self, BoardCell cell);
 static int ticTacToeGameOver(TicTacToe *self);
 static PlayerId ticTacToeWinner(TicTacToe *self);
 static double evalTicTacToePosition(TicTacToe *self);
+static int ticTacToeMoveWorthChecking(Game *self, GameMove move);
 
 const GameVirtualTable ticTacToeVirtualTable = {
   &genericGameMove,
   &validGameMove,
-  0,
+  &ticTacToeMoveWorthChecking,
   &ticTacToeGameOver,
   &ticTacToeWinner,
   &evalTicTacToePosition,
@@ -34,6 +35,10 @@ TicTacToe createTicTacToe(BoardSize size)
   TicTacToe self = createGame(createBoard(size, size));
   self.vtable = &ticTacToeVirtualTable;
   return self;
+}
+
+static int ticTacToeMoveWorthChecking(Game *self, GameMove move) {
+  return move.type == playMove;
 }
 
 static int ticTacToeGameOver(TicTacToe *self)

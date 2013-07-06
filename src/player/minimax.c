@@ -9,10 +9,13 @@
 #include "boarditerator.h"
 #include "minimax.h"
 
-static double searchMaxScore(const MiniMax *self,
-                             GameMove *bestMove,
-                             Game *game,
-                             int lookahead);
+typedef struct ScoredMove {
+  GameMove move;
+  double score;
+} ScoredMove;
+
+static double getScoreOfMove(const MiniMax *self, Game *game, int lookahead);
+static ScoredMove searchBestMove(const MiniMax *self, Game *game, int lookahead);
 
 const double miniMaxWinScore = INFINITY;
 const double miniMaxLoseScore = -INFINITY;
@@ -25,8 +28,35 @@ MiniMax createMiniMax(Game *game) {
   return self;
 }
 
-static double searchMaxScore(const MiniMax *self,
-                             GameMove *bestMove,
+static GameMove firstValidGameMove(const MiniMax *self) {
+  MoveIterator iterator = createMoveIterator(&(((Player *)self)->game->board));
+  nextValidGameMove(((Player *)self)->game, &iterator);
+  return iterator.move;
+}
+
+static ScoredMove searchBestMove(const MiniMax *self,
+                                 Game *game,
+                                 int lookahead)
+{
+  ScoredMove maxScoredMove;
+  maxScoredMove.move = firstValidGameMove(self);
+  maxScoredMove.score = -INFINITY;
+  MoveIterator iterator = createMoveIterator(&game->board);
+  while(nextMoveWorthChecking(game, &iterator)) {
+    double score;
+    Game *nextGame = game->vtable->copy(game);
+    nextGame->vtable->move(nextGame, iterator.move);
+    score = - getScoreOfMove(self, nextGame, lookahead-1);
+    destructGame(nextGame);
+    if (score >= maxScoredMove.score) {
+      maxScoredMove.score = score;
+      maxScoredMove.move = iterator.move;
+    }
+  }
+  return maxScoredMove;
+}
+
+static double getScoreOfMove(const MiniMax *self,
                              Game *game,
                              int lookahead)
 {
@@ -34,23 +64,8 @@ static double searchMaxScore(const MiniMax *self,
   if (   !game->vtable->over(game)
       && (lookahead > 0))
   {
-    double score;
-    double maxScore = -INFINITY;
-    GameMove maxScoredMove = *bestMove;
-    MoveIterator iterator = createMoveIterator(&game->board);
-    while(nextMoveWorthChecking(game, &iterator)) {
-      GameMove ignoredMove;
-      Game *nextGame = game->vtable->copy(game);
-      nextGame->vtable->move(nextGame, iterator.move);
-      score = - searchMaxScore(self, &ignoredMove, nextGame, lookahead-1);
-      destructGame(nextGame);
-      if (score >= maxScore) {
-        maxScore = score;
-        maxScoredMove = iterator.move;
-      }
-    }
-    *bestMove = maxScoredMove;
-    result = maxScore;
+    ScoredMove bestMove = searchBestMove(self, game, lookahead);
+    return bestMove.score;
   } else {
     result = game->vtable->evalPosition(game);
   }
@@ -59,10 +74,7 @@ static double searchMaxScore(const MiniMax *self,
 
 GameMove getMiniMaxMove(MiniMax *self)
 {
-  MoveIterator iterator = createMoveIterator(&(((Player *)self)->game->board));
-  GameMove move;
-  nextValidGameMove(((Player *)self)->game, &iterator);
-  move = iterator.move;
-  searchMaxScore(self, &move, ((Player *)self)->game, self->lookahead);
-  return(move);
+  ScoredMove bestMove =
+      searchBestMove(self, ((Player *)self)->game, self->lookahead);
+  return(bestMove.move);
 }
