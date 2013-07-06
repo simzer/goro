@@ -98,6 +98,14 @@ static void handicapSetAccordingToHandicapOption(void) {
   Goro goro = createGoroFromCLIOption(1, 0);
   assert(boardIsClear(&goro.game->board));
 }
+
+static void goroRunsGameUntilFinished(void) {
+  char *argv[] = { "", "--tictactoe", "--white", "ai", "--black", "ai" };
+  Goro goro = createGoroFromCLIOption(6, argv);
+  runGoro(&goro);
+  assert(1);
+}
+
 void testgoro(void)
 {
   goGameCreatedByDefault();
@@ -114,4 +122,5 @@ void testgoro(void)
   komiSetAccordingToKomiOption();
   handicapSetAccordingToHandicapOption();
   noHandicapByDefault();
+  goroRunsGameUntilFinished();
 }

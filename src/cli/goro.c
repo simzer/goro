@@ -53,8 +53,8 @@ void destructGoro(Goro *self)
 
 void runGoro(Goro *self)
 {
-  startGame(&self->game);
-  while(!self->game->status != finishedStatus)
+  startGame(self->game);
+  while(self->game->status != finishedStatus)
   {
     GameMove move = self->players[self->game->actualPlayer]
                         ->getMove(self->players[self->game->actualPlayer]);
