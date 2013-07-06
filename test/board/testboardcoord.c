@@ -138,7 +138,7 @@ static void invalidCoordinatesConvertedToNanString(void)
   boardCoordsConvertedToString(5, -1, "nan");
 }
 
-static void testHalfNeighbourhood(void)
+static void halfNeighbourhoodGivesHalfEndIndex(void)
 {
   assert(halfNeighbourhood(&fourNeighbourhood).startIndex == 0);
   assert(halfNeighbourhood(&fourNeighbourhood).endIndex == 1);
@@ -146,23 +146,39 @@ static void testHalfNeighbourhood(void)
   assert(halfNeighbourhood(&eightNeighbourhood).endIndex == 3);
 }
 
-void testboardcoord(void)
-{
+static void testBoardCoordString(void) {
   validStringCopiedToBoardCoordString();
   longStringChompedInBoardCoordString();
+  validStringsConvertedToBoardCoord();
+  invalidStringsConvertedToNullCoord();
+  validCoordinatesConvertedToCoordString();
+  invalidCoordinatesConvertedToNanString();
+}
+
+static void testBoardColumn(void) {
   bothCasedCharsConvertedToColumnIndex();
   invalidCharConvertedToInvalidColumnIndex();
   validColumnIndicesConvertedToUpperCaseChars();
   invalidColumnIndicesConvertedToQuestionMark();
+}
+
+static void testBoardCoord(void) {
   boardCoordGetsCoordinates();
   boardCoordAdditionWorksInRange();
   boardCoordSubtractionWorksInRange();
   boardCoordMultiplicationWorkInRange();
   sameBoardCoordsAreEqual();
   differentBoardCoordAreNotEqual();
-  validStringsConvertedToBoardCoord();
-  invalidStringsConvertedToNullCoord();
-  validCoordinatesConvertedToCoordString();
-  invalidCoordinatesConvertedToNanString();
-  testHalfNeighbourhood();
+}
+
+static void testNeighbourhood(void) {
+  halfNeighbourhoodGivesHalfEndIndex();
+}
+
+void testboardcoord(void)
+{
+  testBoardColumn();
+  testBoardCoordString();
+  testBoardCoord();
+  testNeighbourhood();
 }

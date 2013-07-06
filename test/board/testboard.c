@@ -39,7 +39,7 @@ static void clearBoardDetected(void) {
   destructBoard(&board);
 }
 
-static void squareBoardHasSameSizedSide(void)
+static void squareBoardHasSameSizedSides(void)
 {
   Board board = createSquareBoard(4);
   assert(board.width == 4);
@@ -110,7 +110,7 @@ static void cellCanBeReadFromBoard(void)
   destructBoard(&board);
 }
 
-static void setCellReadAsSet(void)
+static void setCellReadBackAsItSet(void)
 {
   Board board = createSquareBoard(19);
   setBoardCell(&board, createBoardCoord(5,7), blackBoardCell);
@@ -119,7 +119,7 @@ static void setCellReadAsSet(void)
   // todo: how to test out of range assertion?
 }
 
-static void clearedCellReadAsClear(void)
+static void clearedCellReadBackAsClear(void)
 {
   Board board = createSquareBoard(19);
   memset(board.cells, blackBoardCell, 19*19);
@@ -215,14 +215,14 @@ void testboard(void)
   boardCellEmptyFillStateDetected();
   newBoardGetsSizes();
   newBoardIsClear();
-  squareBoardHasSameSizedSide();
+  squareBoardHasSameSizedSides();
   copyResultsEqualBoardsOnDifferentMemorySpace();
   boardCanBeCleared();
   equalityDetectedOnSameAndDifferentBoards();
   boardDestructionNullifiesMemoryPointer();
   cellCanBeReadFromBoard();
-  setCellReadAsSet();
-  clearedCellReadAsClear();
+  setCellReadBackAsItSet();
+  clearedCellReadBackAsClear();
   inRangeCoordsAreOnBoard();
   outOfRangeCoordsAreNotOnBoard();
   notFullBoardCanBeDetected();

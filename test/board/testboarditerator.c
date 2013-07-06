@@ -133,14 +133,19 @@ static void boardIteratorStartsOnTopLeftCoord(void)
                           createBoardCoord(0,0)));
 }
 
+static void increaseEveryBoardCell(Board *board) {
+  BoardIterator iterator = createBoardIterator(board);
+  while(!boardIteratorFinished(&iterator)) {
+    setBoardCell(board, iterator.coord,
+                 getBoardCell(board, iterator.coord)+1);
+  }
+}
+
 static void boardIteratorGivesEveryCoordOnce(void)
 {
   int i;
   Board board = createBoard(13,19);
-  BoardIterator iterator = createBoardIterator(&board);
-  while(!boardIteratorFinished(&iterator))
-    setBoardCell(&board, iterator.coord,
-                 getBoardCell(&board, iterator.coord)+1);
+  increaseEveryBoardCell(&board);
   for(i = 0; i < 13*19; i++) assert(board.cells[i] == 1);
   destructBoard(&board);
 }
