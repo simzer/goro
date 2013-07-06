@@ -9,7 +9,15 @@
 
 #include "board.h"
 
-static Board full19x19Board(void) {
+int sameBoardsOnDifferentMemoryLocation(Board *board1, Board *board2)
+{
+  return    board1->cells != board2->cells
+         && board1->height == board2->height
+         && board1->width == board2->width
+         && boardEqual(board1, board2);
+}
+
+Board full19x19Board(void) {
   Board board = createSquareBoard(19);
   memset(board.cells, blackBoardCell, 19*19);
   return board;
@@ -59,17 +67,14 @@ static void testLoadBoard(void)
   // todo: create test, function not used yet, is it necessary at all?
 }
 
-static void copyResultsEqualBoardsOnDifferentMemorySpace(void)
+static void copyResultsEqualBoardsOnDifferentMemoryLocation(void)
 {
   int i;
   Board board = createBoard(10, 15);
   Board board2;
   for (i = 0; i < 10*15; i++) board.cells[i] = rand() % 4;
   board2 = copyBoard(&board);
-  assert(board.cells != board2.cells);
-  assert(board.height == board2.height);
-  assert(board.width == board2.width);
-  assert(boardEqual(&board, &board2));
+  assert(sameBoardsOnDifferentMemoryLocation(&board, &board2));
   destructBoard(&board);
   destructBoard(&board2);
 }
@@ -167,16 +172,23 @@ static void notFullBoardCanBeDetected(void)
   destructBoard(&board);
 }
 
+static void testTengenNeigbour(Board *board, Neighbourhood neighbourhood,
+                               int hasNeighbour)
+{
+  assert(boardCellHasNeighbour(board,boardTengen(board), neighbourhood)
+          == hasNeighbour);
+}
+
 static void boardCellNeighbourDetected(void)
 {
   Board board = createSquareBoard(19);
-  assert(!boardCellHasNeighbour(&board,boardTengen(&board), fourNeighbourhood));
+  testTengenNeigbour(&board, fourNeighbourhood, 0);
   setBoardCell(&board, createBoardCoord(10,10), blackBoardCell);
-  assert(!boardCellHasNeighbour(&board, boardTengen(&board), fourNeighbourhood));
-  assert(boardCellHasNeighbour(&board, boardTengen(&board), eightNeighbourhood));
+  testTengenNeigbour(&board, fourNeighbourhood, 0);
+  testTengenNeigbour(&board, eightNeighbourhood, 1);
   setBoardCell(&board, createBoardCoord(9,10), blackBoardCell);
-  assert(boardCellHasNeighbour(&board, boardTengen(&board), fourNeighbourhood));
-  assert(boardCellHasNeighbour(&board, boardTengen(&board), eightNeighbourhood));
+  testTengenNeigbour(&board, fourNeighbourhood, 1);
+  testTengenNeigbour(&board, eightNeighbourhood, 1);
   destructBoard(&board);
 }
 
@@ -216,7 +228,7 @@ void testboard(void)
   newBoardGetsSizes();
   newBoardIsClear();
   squareBoardHasSameSizedSides();
-  copyResultsEqualBoardsOnDifferentMemorySpace();
+  copyResultsEqualBoardsOnDifferentMemoryLocation();
   boardCanBeCleared();
   equalityDetectedOnSameAndDifferentBoards();
   boardDestructionNullifiesMemoryPointer();

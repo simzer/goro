@@ -10,9 +10,10 @@
 
 static void switchGamePlayer(Game *self);
 
-const BoardCell gamePlayerCells[numberOfPlayers] = {
+const BoardCell gamePlayerCells[numberOfPlayers + 1] = {
   blackBoardCell,
-  whiteBoardCell
+  whiteBoardCell,
+  invalidBoardCell
 };
 
 const char *gamePlayerNames[numberOfPlayers] = {
@@ -28,10 +29,11 @@ BoardCell actualGamePlayerCell(Game *self)
 Game createGame(Board board)
 {
   Game self;
-  self.actualPlayer = firstPlayer;
+  self.status = notStartedStatus;
+  self.actualPlayer = noPlayer;
+  self.winner = noPlayer;
   self.board = board;
   self.lastMove = nullMove;
-  self.winner = noPlayer;
   return self;
 }
 
@@ -46,11 +48,27 @@ Game *copyGame(Game *self)
 void destructGame(Game *self)
 {
   destructBoard(&(self->board));
-  free(self);
 }
 
-void genericGameMove(Game *self, GameMove move)
+void startGame(Game *self)
 {
+  self->status = activeStatus;
+  self->actualPlayer = firstPlayer;
+}
+
+static void finishGame(Game *self) {
+  self->winner = self->vtable->winner(self);
+  self->actualPlayer = noPlayer;
+  self->status = finishedStatus;
+}
+
+static void updateGameStatus(Game *self) {
+  if(self->vtable->over(self)) finishGame(self);
+}
+
+int genericGameMove(Game *self, GameMove move)
+{
+  if (!self->vtable->validMove(self, move)) return 0;
   self->lastMove = move;
   if(move.type == playMove) {
     setBoardCell(&self->board, move.coord, actualGamePlayerCell(self));
@@ -58,6 +76,8 @@ void genericGameMove(Game *self, GameMove move)
     self->winner = otherGamePlayer(self);
   }
   switchGamePlayer(self);
+  updateGameStatus(self);
+  return 1;
 }
 
 static void switchGamePlayer(Game *self)
@@ -72,9 +92,9 @@ PlayerId actualGamePlayer(Game *self)
 
 PlayerId otherGamePlayer(Game *self)
 {
-  return (self->actualPlayer == firstPlayer)
-         ? secondPlayer
-         : firstPlayer;
+  return (self->status != activeStatus)      ? noPlayer :
+         (self->actualPlayer == firstPlayer) ? secondPlayer :
+                                               firstPlayer;
 }
 
 int genericGameOver(Game *self)
@@ -85,9 +105,10 @@ int genericGameOver(Game *self)
 
 int validGameMove(Game *self, GameMove move)
 {
-  return    move.type == resignMove
-         || move.type == passMove
-         || getBoardCell(&(self->board), move.coord) == emptyBoardCell;
+  return    self->status != finishedStatus
+         && (   move.type == resignMove
+             || move.type == passMove
+             || getBoardCell(&(self->board), move.coord) == emptyBoardCell);
 }
 
 int nextValidGameMove(Game *self, MoveIterator *iterator)

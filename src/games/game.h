@@ -10,16 +10,22 @@
 #include "board.h"
 
 typedef enum {
-  noPlayer = -1,
   firstPlayer = 0,
   secondPlayer = 1,
+  noPlayer,
   numberOfPlayers = 2
 } PlayerId;
+
+typedef enum {
+  notStartedStatus,
+  activeStatus,
+  finishedStatus
+} GameStatus;
 
 typedef struct Game Game;
 
 typedef struct GameVirtualTable {
-  void (*move)(Game *self, GameMove move);
+  int (*move)(Game *self, GameMove move);
   int (*validMove)(Game *self, GameMove move);
   int (*moveWorthChecking)(Game *self, GameMove move);
   int (*over)(Game *self);
@@ -31,6 +37,7 @@ typedef struct GameVirtualTable {
 } GameVirtualTable;
 
 struct Game {
+  GameStatus status;
   PlayerId actualPlayer;
   Board board;
   GameMove lastMove;
@@ -38,20 +45,23 @@ struct Game {
   const GameVirtualTable *vtable;
 };
 
-extern const BoardCell gamePlayerCells[numberOfPlayers];
+extern const BoardCell gamePlayerCells[numberOfPlayers + 1];
 extern const char *gamePlayerNames[numberOfPlayers];
 extern Game createGame(Board board);
 extern Game *copyGame(Game *self);
 extern void destructGame(Game *self);
-extern void genericGameMove(Game *self, GameMove move);
+extern void startGame(Game *self);
+extern int genericGameMove(Game *self, GameMove move);
 extern BoardCell actualGamePlayerCell(Game *self);
-extern int validGameMove(Game *self, GameMove move);
-extern int genericGameOver(Game *self);
-extern int nextValidGameMove(Game *self, MoveIterator *iterator);
-extern int nextMoveWorthChecking(Game *self, MoveIterator *iterator);
 extern PlayerId otherGamePlayer(Game *self);
 extern PlayerId actualGamePlayer(Game *self);
 extern void printGameOverInfo(Game *self);
 extern void printGameStatus(Game *self);
+
+extern int nextValidGameMove(Game *self, MoveIterator *iterator);
+extern int nextMoveWorthChecking(Game *self, MoveIterator *iterator);
+
+extern int validGameMove(Game *self, GameMove move);
+extern int genericGameOver(Game *self);
 
 #endif
