@@ -53,11 +53,11 @@ void destructGoro(Goro *self)
 
 void runGoro(Goro *self)
 {
-  while(!self->game->vtable->over(self->game))
+  startGame(&self->game);
+  while(!self->game->status != finishedStatus)
   {
-    GameMove move;
-    move = self->players[self->game->actualPlayer]
-                ->getMove(self->players[self->game->actualPlayer]);
+    GameMove move = self->players[self->game->actualPlayer]
+                        ->getMove(self->players[self->game->actualPlayer]);
     self->game->vtable->move(self->game, move);
   }
   printGameOverInfo(self->game);
@@ -67,9 +67,9 @@ static void initGoroPlayersFromCLI(Goro *self)
 {
   PlayerId player;
   char *playerCliOption[] = { "--black", "--white" };
-  for(player = firstPlayer; player == secondPlayer; player++) {
+  for(player = firstPlayer; player <= secondPlayer; player++) {
     if(cliOptionSet(&self->options, playerCliOption[player])) {
-      self->players[firstPlayer] =
+      self->players[player] =
           createPlayerByName(self,
                              getCliOptionValue(&self->options,
                                                playerCliOption[player]));

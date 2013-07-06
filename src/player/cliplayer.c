@@ -7,7 +7,7 @@
 #include  "string.h"
 #include  "cliplayer.h"
 
-static GameMove getCLIPlayerMove(CLIPlayer *self);
+GameMove getCLIPlayerMove(CLIPlayer *self);
 
 CLIPlayer createCLIPlayer(Game *game)
 {
@@ -17,7 +17,7 @@ CLIPlayer createCLIPlayer(Game *game)
   return self;
 }
 
-static GameMove getCLIPlayerMove(CLIPlayer *self)
+GameMove getCLIPlayerMove(CLIPlayer *self)
 {
   GameMove move;
   GameMoveString string;

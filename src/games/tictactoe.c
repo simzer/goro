@@ -17,7 +17,7 @@ static int ticTacToeGameOver(TicTacToe *self);
 static PlayerId ticTacToeWinner(TicTacToe *self);
 static double evalTicTacToePosition(TicTacToe *self);
 
-static const GameVirtualTable ticTacToeVirtualTable = {
+const GameVirtualTable ticTacToeVirtualTable = {
   &genericGameMove,
   &validGameMove,
   0,
@@ -98,8 +98,7 @@ static int anyDiagonalFilled(TicTacToe *self, BoardCell cell)
 
 static double evalTicTacToePosition(TicTacToe *self)
 {
-  PlayerId winner = ticTacToeWinner(self);
-  return (winner == self->actualPlayer ? miniMaxWinScore :
-          winner == noPlayer     ? 0 :
-                                      miniMaxLoseScore );
+  return (self->winner == self->actualPlayer ? miniMaxWinScore :
+          self->winner == noPlayer           ? 0 :
+                                               miniMaxLoseScore );
 }

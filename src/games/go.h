@@ -16,6 +16,7 @@ typedef struct Go {
 } Go;
 
 #define maxStandardGoHandicaps 9
+extern const GameVirtualTable goVirtualtable;
 extern const BoardCoordString standardGoHandicaps[maxStandardGoHandicaps]
                                                  [maxStandardGoHandicaps];
 extern Go createGo(Board board);

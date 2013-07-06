@@ -17,5 +17,6 @@ typedef struct GTP {
 } GTP;
 
 extern GTP createGTP(Game *game);
+extern GameMove getGTPMove(GTP *self);
 
 #endif

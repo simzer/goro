@@ -41,7 +41,7 @@ const BoardCoordString standardGoHandicaps[maxStandardGoHandicaps]
   {{"D4"}, {"Q16"}, {"D16"}, {"Q4"}, {"D10"}, {"Q10"}, {"K4"}, {"K16"}, {"K10"}},
 };
 
-static const GameVirtualTable goVirtualtable = {
+const GameVirtualTable goVirtualtable = {
   &goMove,
   &validGoMove,
   &goMoveWorthChecking,

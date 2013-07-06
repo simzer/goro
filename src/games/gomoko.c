@@ -23,7 +23,7 @@ static PlayerId gomokoWinner(Gomoko *self);
 static double evalGomokoPosition(Gomoko *self);
 static Gomoko *copyGomokoGame(Gomoko *self);
 
-static const GameVirtualTable gomokoVirtualtable = {
+const GameVirtualTable gomokoVirtualTable = {
   &genericGameMove,
   &validGameMove,
   &gomokoMoveWorthChecking,
@@ -39,7 +39,7 @@ Gomoko createGomoko(Board board)
 {
   Gomoko self;
   self.game = createGame(board);
-  self.game.vtable = &gomokoVirtualtable;
+  self.game.vtable = &gomokoVirtualTable;
   self.winnerRowSize = 5;
   return self;
 }

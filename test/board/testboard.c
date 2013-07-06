@@ -41,9 +41,9 @@ static void newBoardGetsSizes(void)
 
 static void clearBoardDetected(void) {
   Board board = createSquareBoard(4);
-  assert(isBoardClear(&board));
+  assert(boardIsClear(&board));
   setBoardCell(&board, createBoardCoord(3,3), blackBoardCell);
-  assert(!isBoardClear(&board));
+  assert(!boardIsClear(&board));
   destructBoard(&board);
 }
 
@@ -58,7 +58,7 @@ static void squareBoardHasSameSizedSides(void)
 static void newBoardIsClear(void)
 {
   Board board = createSquareBoard(4);
-  assert(isBoardClear(&board));
+  assert(boardIsClear(&board));
   destructBoard(&board);
 }
 
@@ -83,7 +83,7 @@ static void boardCanBeCleared(void)
 {
   Board board = createBoard(3,4);
   clearBoard(&board);
-  assert(isBoardClear(&board));
+  assert(boardIsClear(&board));
   destructBoard(&board);
 }
 

@@ -9,8 +9,6 @@
 #include "boarditerator.h"
 #include "minimax.h"
 
-static GameMove getMiniMaxMove(MiniMax *self);
-
 static double searchMaxScore(const MiniMax *self,
                              GameMove *bestMove,
                              Game *game,
@@ -59,7 +57,7 @@ static double searchMaxScore(const MiniMax *self,
   return result;
 }
 
-static GameMove getMiniMaxMove(MiniMax *self)
+GameMove getMiniMaxMove(MiniMax *self)
 {
   MoveIterator iterator = createMoveIterator(&(((Player *)self)->game->board));
   GameMove move;

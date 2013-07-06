@@ -13,5 +13,6 @@ typedef struct CLIPlayer {
 } CLIPlayer;
 
 extern CLIPlayer createCLIPlayer(Game *game);
+extern GameMove getCLIPlayerMove(CLIPlayer *self);
 
 #endif

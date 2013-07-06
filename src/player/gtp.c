@@ -10,7 +10,6 @@
 #include "go.h"
 #include "gtp.h"
 
-static GameMove getGTPMove(GTP *self);
 static void processCommand(GTP *self, char *command, char *argument);
 static void sendLastMove(GTP *self);
 static void warning(GTP *self, char *message);
@@ -64,7 +63,7 @@ static int lastMoveNotSent(GTP *self) {
                         self->player.game->lastMove);
 }
 
-static GameMove getGTPMove(GTP *self)
+GameMove getGTPMove(GTP *self)
 {
   char line[1024];
   char command[64];

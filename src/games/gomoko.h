@@ -13,6 +13,7 @@ typedef struct Gomoko {
   int winnerRowSize;
 } Gomoko;
 
+extern const GameVirtualTable gomokoVirtualTable;
 extern Gomoko createGomoko(Board board);
 
 #endif

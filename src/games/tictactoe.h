@@ -9,6 +9,7 @@
 #include "game.h"
 
 typedef Game TicTacToe;
+extern const GameVirtualTable ticTacToeVirtualTable;
 extern TicTacToe createTicTacToe(BoardSize size);
 
 #endif

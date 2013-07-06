@@ -30,7 +30,7 @@ extern Board createSquareBoard(BoardSize size);
 extern Board loadBoard(FILE *file);
 extern Board copyBoard(Board *self);
 extern void clearBoard(Board *self);
-extern int isBoardClear(Board *self);
+extern int boardIsClear(Board *self);
 extern int boardEqual(Board *self, Board *ref);
 extern void destructBoard(Board *self);
 extern BoardCell getBoardCell(Board *self, BoardCoord coord);

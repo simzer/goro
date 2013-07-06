@@ -196,7 +196,7 @@ Board loadBoard(FILE *file)
   return(self);
 }
 
-int isBoardClear(Board *self)
+int boardIsClear(Board *self)
 {
   int i;
   for(i = 0; i < self->width * self->height; i++) {
