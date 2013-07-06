@@ -3,6 +3,7 @@
 
    Copyright (C) 2013 Goro Team <https://github.com/goro-dev?tab=members> */
 
+#include <stdlib.h>
 #include <assert.h>
 
 #include "gamemove.h"
@@ -72,32 +73,16 @@ static void coordStringConvertsToCorrespondingPlayMove(void) {
                        createPlayMove(createBoardCoord(4,6))));
 }
 
-static void testGameMove(void) {
-  createdGameMoveGetsCoordAndType();
-  everyMoveTypeGetAppropriateType();
-  playMovesEqualOnlyIfCoordsEqual();
-  nonPlayMovesEqualEvenIfCoordsDiffer();
-  movesDifferIfAtLeastTypesDiffer();
-}
-
-static void testGameMoveString(void) {
-  playMoveConvertToStringOfItsCoord();
-  specialMovesConvertToStringOfTheirType();
-  specialMoveStringsConvertsToSpecialMoves();
-  invalidStringsConvertToInvalidMove();
-  coordStringConvertsToCorrespondingPlayMove();
-}
-
 static MoveIterator exampleMoveIterator(void) {
-  Board board = createBoard(13,19);
-  MoveIterator iterator = createMoveIterator(&board);
-  return iterator;
+  Board *board = malloc(sizeof(Board));
+  *board = createBoard(13,19);
+  return createMoveIterator(board);
 }
 
 static MoveIterator moveIteratorStepped(int steps) {
   int i;
   MoveIterator iterator = exampleMoveIterator();
-  for(i = 0; i < 2; i++) moveIteratorFinished(&iterator);
+  for(i = 0; i < steps; i++) moveIteratorFinished(&iterator);
   return iterator;
 }
 
@@ -119,15 +104,55 @@ static void moveIteratorGivesResignAtSecondStep(void) {
 
 static void moveIteratorGivesTopLeftPlayAtThirdStep(void) {
   testIteratorMove(moveIteratorStepped(3),
-                   stringToGameMove("A1"));
+                   createPlayMove(createBoardCoord(0,0)));
 }
 
-static void moveIteratorGivesEveryBoardCellOnce(void);
+static void moveIteratorGivesEveryBoardCellOnce(void)
+{
 
-static void notFinishingMoveIteratorResultsTrue(void);
-static void finishingMoveIteratorResultsFalse(void);
-static void finishedMoveIteratorGivesNullMove(void);
+}
 
+static void notFinishingMoveIteratorResultsTrue(void)
+{
+  int i;
+  for(i = 0; i < 2 + 13*19; i++) {
+    MoveIterator iterator = moveIteratorStepped(i);
+    assert(!moveIteratorFinished(&iterator));
+  }
+}
+
+static void finishingMoveIteratorGivesBottomRightPlay(void)
+{
+  testIteratorMove(moveIteratorStepped(2 + 13*19),
+                   createPlayMove(createBoardCoord(18,12)));
+}
+
+static void finishingMoveIteratorResultsFalse(void)
+{
+  MoveIterator iterator = moveIteratorStepped(2 + 13*19);
+  assert(moveIteratorFinished(&iterator));
+}
+
+static void finishedMoveIteratorGivesNullMove(void)
+{
+  testIteratorMove(moveIteratorStepped(2 + 13*19 + 1), nullMove);
+}
+
+static void testGameMove(void) {
+  createdGameMoveGetsCoordAndType();
+  everyMoveTypeGetAppropriateType();
+  playMovesEqualOnlyIfCoordsEqual();
+  nonPlayMovesEqualEvenIfCoordsDiffer();
+  movesDifferIfAtLeastTypesDiffer();
+}
+
+static void testGameMoveString(void) {
+  playMoveConvertToStringOfItsCoord();
+  specialMovesConvertToStringOfTheirType();
+  specialMoveStringsConvertsToSpecialMoves();
+  invalidStringsConvertToInvalidMove();
+  coordStringConvertsToCorrespondingPlayMove();
+}
 
 static void testGameMoveIterator(void) {
   notStartedMoveIteratorGivesNullMove();
@@ -136,6 +161,7 @@ static void testGameMoveIterator(void) {
   moveIteratorGivesResignAtSecondStep();
   moveIteratorGivesTopLeftPlayAtThirdStep();
   moveIteratorGivesEveryBoardCellOnce();
+  finishingMoveIteratorGivesBottomRightPlay();
   finishingMoveIteratorResultsFalse();
   finishedMoveIteratorGivesNullMove();
 }

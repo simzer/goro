@@ -82,11 +82,16 @@ MoveIterator createMoveIterator(Board *board) {
 int moveIteratorFinished(MoveIterator *self) {
   if(self->move.type < playMove) {
     self->move.type++;
-    return 0;
-  } else if(!boardIteratorFinished(&self->boardIterator)) {
-    return 0;
+  };
+  if(self->move.type == playMove) {
+    if(!boardIteratorFinished(&self->boardIterator)) {
+      self->move.coord = self->boardIterator.coord;
+      return 0;
+    } else {
+      self->move = nullMove;
+      return 1;
+    }
   } else {
-    self->move = nullMove;
-    return 1;
+    return 0;
   }
 }
