@@ -103,7 +103,7 @@ static int anyDiagonalFilled(TicTacToe *self, BoardCell cell)
 
 static double evalTicTacToePosition(TicTacToe *self)
 {
-  return (self->winner == self->actualPlayer ? miniMaxWinScore :
-          self->winner == noPlayer           ? 0 :
-                                               miniMaxLoseScore );
+  return (self->winner == self->lastPlayer ? miniMaxLoseScore :
+          self->winner == noPlayer         ? 0 :
+                                             miniMaxWinScore );
 }

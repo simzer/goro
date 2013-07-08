@@ -31,9 +31,11 @@ Game createGame(Board board)
   Game self;
   self.status = notStartedStatus;
   self.actualPlayer = noPlayer;
+  self.lastPlayer = noPlayer;
   self.winner = noPlayer;
   self.board = board;
   self.lastMove = nullMove;
+  self.movesDone = 0;
   return self;
 }
 
@@ -75,8 +77,10 @@ int genericGameMove(Game *self, GameMove move)
   } else if(move.type == resignMove) {
     self->winner = otherGamePlayer(self);
   }
+  self->lastPlayer = self->actualPlayer;
   switchGamePlayer(self);
   updateGameStatus(self);
+  self->movesDone++;
   return 1;
 }
 

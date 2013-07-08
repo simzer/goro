@@ -30,7 +30,7 @@ typedef struct GameVirtualTable {
   int (*moveWorthChecking)(Game *self, GameMove move);
   int (*over)(Game *self);
   PlayerId (*winner)(Game *self);
-  double (*evalPosition)(Game *self);
+  double (*evalPosition)(Game *self); //rename to estimatedScore
   Game *(*copy)(Game *self);
   double (*score)(Game *self);
   void (*printGameStatus)(Game *self);
@@ -39,9 +39,11 @@ typedef struct GameVirtualTable {
 struct Game {
   GameStatus status;
   PlayerId actualPlayer;
+  PlayerId lastPlayer;
   Board board;
   GameMove lastMove;
   PlayerId winner;
+  int movesDone;
   const GameVirtualTable *vtable;
 };
 
