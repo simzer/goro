@@ -9,4 +9,12 @@
 
 void testtictactoe(void)
 {
+  TicTacToe game = createTicTacToe(3);
+  MoveIterator iterator = createMoveIterator(&game.board);
+  startGame(&game);
+  while(game.status != finishedStatus) {
+    assert(nextMoveWorthChecking(&game, &iterator));
+    game.vtable->move(&game, iterator.move);
+    game.vtable->printGameStatus(&game);
+  }
 }
